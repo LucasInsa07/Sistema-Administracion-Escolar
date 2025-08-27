@@ -10,7 +10,7 @@ public class Administrador extends BaseEntity {
     private String usuario;
 
     @Column(nullable = false, length = 255)
-    private String contraseña;
+    private String contrasena;
 
     @Column(nullable = false, length = 20)
     private String rol; // Ej: ADMIN, SUPERADMIN
@@ -25,12 +25,12 @@ public class Administrador extends BaseEntity {
         this.usuario = usuario;
     }
 
-    public String getContraseña() {
-        return contraseña;
+    public String getContrasena() {
+        return contrasena;
     }
 
-    public void setContraseña(String contraseña) {
-        this.contraseña = contraseña;
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
     }
 
     public String getRol() {
