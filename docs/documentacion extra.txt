@@ -1,0 +1,49 @@
+EJEMPLO DE FLUJO DE DATOS:
+
+1.
+[USUARIO] (via Postman o frontend)
+    ↓
+ → [POST /api/alumnos]
+    → Crea Alumno (AlumnoController → AlumnoService → AlumnoRepository → DB)
+
+ → [POST /api/profesores]
+    → Crea Profesor (similar flujo)
+
+ → [POST /api/materias]
+    → Crea Materia con referencia a Profesor (materia.profesor.id)
+
+ → [POST /api/cursos]
+    → Crea Curso
+
+ → [POST /api/dictados]
+    → Relaciona Materia con Curso
+        - Se crea un Dictado con materia_id + curso_id
+        - Permite saber qué materia se dicta en qué curso
+
+ → [POST /api/inscripciones]
+    → Inscribe un Alumno a un Curso
+        - Se crea una Inscripción con alumno_id + curso_id + estado + fecha
+        - Permite saber qué alumno cursa qué materias (indirectamente a través de Dictado)
+
+2. 
+Alumno ---+
+          |        +--- Materia ←--- Profesor
+          |        |
+          +--> Inscripcion --> Curso --> Dictado --> Materia
+
+3.
+Ejemplo real:
+Se crea Alumno(id=1) → Juan Pérez
+
+Se crea Profesor(id=2) → Lucía Ramírez
+
+Se crea Materia(id=3, profesor=2) → Matemática
+
+Se crea Curso(id=4) → 1ro A
+
+Se crea Dictado(materia=3, curso=4) → Matemática en 1ro A
+
+Se crea Inscripción(alumno=1, curso=4, estado=ACTIVO) → Juan cursa 1ro A
+
+📍 Resultado: Juan cursa la materia Matemática en el curso 1ro A con la profesora Lucía Ramírez.
+
