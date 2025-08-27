@@ -47,3 +47,14 @@ Se crea Inscripción(alumno=1, curso=4, estado=ACTIVO) → Juan cursa 1ro A
 
 📍 Resultado: Juan cursa la materia Matemática en el curso 1ro A con la profesora Lucía Ramírez.
 
+
+## Ejecución de pruebas
+
+Para ejecutar todas las pruebas del proyecto utiliza Maven:
+
+```
+./mvnw test
+```
+
+Este comando compila el proyecto y ejecuta la suite de tests.
+
