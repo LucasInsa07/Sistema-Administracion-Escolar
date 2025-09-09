@@ -1,16 +1,25 @@
 package com.demo.sistema_gestion_escolar.controller;
 
-import com.demo.sistema_gestion_escolar.model.Administrador;
-import com.demo.sistema_gestion_escolar.service.AdministradorService;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.demo.sistema_gestion_escolar.model.Administrador;
+import com.demo.sistema_gestion_escolar.service.AdministradorService;
+
+import jakarta.validation.Valid;
+
 @RestController
-@RequestMapping("/api/administradores")
+@RequestMapping("/api/v1/administradores")
 public class AdministradorController {
 
     @Autowired

@@ -1,0 +1,127 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Updated to user's requested color palette: #450920, #A53860, #DA627D, #FFA5AB */
+  --background: #fdf2f8;
+  --foreground: #450920;
+  --card: #ffffff;
+  --card-foreground: #450920;
+  --popover: #ffffff;
+  --popover-foreground: #450920;
+  --primary: #450920;
+  --primary-foreground: #ffffff;
+  --secondary: #a53860;
+  --secondary-foreground: #ffffff;
+  --muted: #fce7f3;
+  --muted-foreground: #a53860;
+  --accent: #da627d;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #f3e8ff;
+  --input: #ffffff;
+  --ring: #da627d;
+  --chart-1: #450920;
+  --chart-2: #a53860;
+  --chart-3: #da627d;
+  --chart-4: #ffa5ab;
+  --chart-5: #f3e8ff;
+  --radius: 0.5rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #450920;
+  --sidebar-primary: #fdf2f8;
+  --sidebar-primary-foreground: #450920;
+  --sidebar-accent: #a53860;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #f3e8ff;
+  --sidebar-ring: #da627d;
+}
+
+.dark {
+  /* Updated dark mode with new palette maintaining proper contrast */
+  --background: #450920;
+  --foreground: #ffa5ab;
+  --card: #5d1a2b;
+  --card-foreground: #ffa5ab;
+  --popover: #5d1a2b;
+  --popover-foreground: #ffa5ab;
+  --primary: #ffa5ab;
+  --primary-foreground: #450920;
+  --secondary: #da627d;
+  --secondary-foreground: #450920;
+  --muted: #a53860;
+  --muted-foreground: #ffa5ab;
+  --accent: #da627d;
+  --accent-foreground: #450920;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #a53860;
+  --input: #5d1a2b;
+  --ring: #da627d;
+  --chart-1: #ffa5ab;
+  --chart-2: #da627d;
+  --chart-3: #a53860;
+  --chart-4: #450920;
+  --chart-5: #5d1a2b;
+  --sidebar: #5d1a2b;
+  --sidebar-foreground: #ffa5ab;
+  --sidebar-primary: #a53860;
+  --sidebar-primary-foreground: #ffa5ab;
+  --sidebar-accent: #da627d;
+  --sidebar-accent-foreground: #450920;
+  --sidebar-border: #a53860;
+  --sidebar-ring: #da627d;
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

@@ -1,6 +1,10 @@
 package com.demo.sistema_gestion_escolar.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "administrador")
@@ -38,6 +42,21 @@ public class Administrador extends BaseEntity {
     }
 
     public void setRol(String rol) {
-        this.rol = rol;
+        if (rol == null) {
+            throw new IllegalArgumentException("El rol no puede ser nulo");
+        }
+        String upper = rol.trim().toUpperCase();
+        if (!upper.equals("ADMIN") && !upper.equals("ALUMNO") && !upper.equals("PADRE")) {
+            throw new IllegalArgumentException("Rol inválido. Debe ser ADMIN, ALUMNO o PADRE");
+        }
+        this.rol = upper;
+    }
+
+    @PrePersist
+    @PreUpdate
+    public void normalizeRole() {
+        if (this.rol != null) {
+            this.rol = this.rol.trim().toUpperCase();
+        }
     }
 }

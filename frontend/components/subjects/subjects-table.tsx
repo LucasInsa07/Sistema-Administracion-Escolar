@@ -1,0 +1,158 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Search, Plus, Edit, Trash2 } from "lucide-react"
+import { SubjectDialog } from "./subject-dialog"
+import { getSubjects, deleteSubject } from "@/lib/api/subjects"
+import type { Subject } from "@/lib/types"
+
+export function SubjectsTable() {
+  const [subjects, setSubjects] = useState<Subject[]>([])
+  const [filteredSubjects, setFilteredSubjects] = useState<Subject[]>([])
+  const [searchTerm, setSearchTerm] = useState("")
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadSubjects()
+  }, [])
+
+  useEffect(() => {
+    const filtered = subjects.filter(
+      (subject) =>
+        subject.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        subject.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        `${subject.profesor.nombre} ${subject.profesor.apellido}`.toLowerCase().includes(searchTerm.toLowerCase()),
+    )
+    setFilteredSubjects(filtered)
+  }, [subjects, searchTerm])
+
+  const loadSubjects = async () => {
+    try {
+      setLoading(true)
+      const data = await getSubjects()
+      setSubjects(data)
+    } catch (error) {
+      console.error("Error loading subjects:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleEdit = (subject: Subject) => {
+    setSelectedSubject(subject)
+    setIsDialogOpen(true)
+  }
+
+  const handleDelete = async (id: number) => {
+    if (confirm("¿Está seguro de que desea eliminar esta materia?")) {
+      try {
+        await deleteSubject(id)
+        await loadSubjects()
+      } catch (error) {
+        console.error("Error deleting subject:", error)
+      }
+    }
+  }
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false)
+    setSelectedSubject(null)
+    loadSubjects()
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Gestión de Materias</CardTitle>
+            <CardDescription>Administra las materias y sus profesores asignados</CardDescription>
+          </div>
+          <Button onClick={() => setIsDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nueva Materia
+          </Button>
+        </div>
+        <div className="flex items-center space-x-2">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por materia, descripción o profesor..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="text-muted-foreground">Cargando materias...</div>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID</TableHead>
+                <TableHead>Materia</TableHead>
+                <TableHead>Descripción</TableHead>
+                <TableHead>Profesor</TableHead>
+                <TableHead>Especialidad</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead className="text-right">Acciones</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredSubjects.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8">
+                    {searchTerm ? "No se encontraron materias" : "No hay materias registradas"}
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredSubjects.map((subject) => (
+                  <TableRow key={subject.id}>
+                    <TableCell className="font-mono text-sm text-muted-foreground">#{subject.id}</TableCell>
+                    <TableCell className="font-medium">{subject.nombre}</TableCell>
+                    <TableCell className="max-w-xs truncate">{subject.descripcion}</TableCell>
+                    <TableCell>
+                      {subject.profesor.nombre} {subject.profesor.apellido}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{subject.profesor.especialidad}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={subject.activo ? "default" : "secondary"}>
+                        {subject.activo ? "Activa" : "Inactiva"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button variant="ghost" size="sm" onClick={() => handleEdit(subject)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDelete(subject.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        )}
+      </CardContent>
+
+      <SubjectDialog open={isDialogOpen} onClose={handleDialogClose} subject={selectedSubject} />
+    </Card>
+  )
+}

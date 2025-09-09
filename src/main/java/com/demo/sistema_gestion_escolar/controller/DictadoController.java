@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,13 +23,14 @@ import com.demo.sistema_gestion_escolar.service.DictadoService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/dictados")
+@RequestMapping("/api/v1/dictados")
 public class DictadoController {
 
     @Autowired
     private DictadoService dictadoService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> crear(@Valid @RequestBody Dictado dictado) {
         try {
             Dictado nuevoDictado = dictadoService.crear(dictado);
@@ -58,6 +60,7 @@ public class DictadoController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody Dictado dictado) {
         try {
             Dictado actualizado = dictadoService.actualizar(id, dictado);
@@ -74,6 +77,7 @@ public class DictadoController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         dictadoService.eliminar(id);
         return ResponseEntity.noContent().build();
