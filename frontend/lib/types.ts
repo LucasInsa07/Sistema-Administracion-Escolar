@@ -2,65 +2,39 @@ export interface Student {
   id: number
   nombre: string
   apellido: string
-  dni: string
   email: string
-  telefono: string
-  direccion: string
-  fechaNacimiento: string
-  activo: boolean
-  fechaCreacion?: string
-  fechaActualizacion?: string
 }
 
 export interface CreateStudentRequest {
   nombre: string
   apellido: string
-  dni: string
   email: string
-  telefono: string
-  direccion: string
-  fechaNacimiento: string
-  activo: boolean
 }
 
 export interface Teacher {
   id: number
   nombre: string
   apellido: string
-  dni: string
   email: string
-  telefono: string
-  especialidad: string
-  activo: boolean
-  fechaCreacion?: string
-  fechaActualizacion?: string
 }
 
 export interface CreateTeacherRequest {
   nombre: string
   apellido: string
-  dni: string
   email: string
-  telefono: string
-  especialidad: string
-  activo: boolean
 }
 
 export interface Subject {
   id: number
   nombre: string
-  descripcion: string
-  profesor: Teacher
-  activo: boolean
-  fechaCreacion?: string
-  fechaActualizacion?: string
+  profesorId: number
+  profesorNombre: string
+  profesorApellido: string
 }
 
 export interface CreateSubjectRequest {
   nombre: string
-  descripcion: string
   profesorId: number
-  activo: boolean
 }
 
 export interface Course {

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+
 import { Search, Plus, Edit, Trash2 } from "lucide-react"
 import { TeacherDialog } from "./teacher-dialog"
 import { getTeachers, deleteTeacher } from "@/lib/api/teachers"
@@ -28,9 +28,7 @@ export function TeachersTable() {
       (teacher) =>
         teacher.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
         teacher.apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        teacher.dni.includes(searchTerm) ||
-        teacher.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        teacher.especialidad.toLowerCase().includes(searchTerm.toLowerCase()),
+        teacher.email.toLowerCase().includes(searchTerm.toLowerCase()),
     )
     setFilteredTeachers(filtered)
   }, [teachers, searchTerm])
@@ -86,7 +84,7 @@ export function TeachersTable() {
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar por nombre, DNI, email o especialidad..."
+              placeholder="Buscar por nombre, apellido o email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-8"
@@ -105,18 +103,14 @@ export function TeachersTable() {
               <TableRow>
                 <TableHead>ID</TableHead>
                 <TableHead>Nombre</TableHead>
-                <TableHead>DNI</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Especialidad</TableHead>
-                <TableHead>Teléfono</TableHead>
-                <TableHead>Estado</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredTeachers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
+                  <TableCell colSpan={4} className="text-center py-8">
                     {searchTerm ? "No se encontraron profesores" : "No hay profesores registrados"}
                   </TableCell>
                 </TableRow>
@@ -127,17 +121,7 @@ export function TeachersTable() {
                     <TableCell className="font-medium">
                       {teacher.nombre} {teacher.apellido}
                     </TableCell>
-                    <TableCell>{teacher.dni}</TableCell>
                     <TableCell>{teacher.email}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{teacher.especialidad}</Badge>
-                    </TableCell>
-                    <TableCell>{teacher.telefono}</TableCell>
-                    <TableCell>
-                      <Badge variant={teacher.activo ? "default" : "secondary"}>
-                        {teacher.activo ? "Activo" : "Inactivo"}
-                      </Badge>
-                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Button variant="ghost" size="sm" onClick={() => handleEdit(teacher)}>

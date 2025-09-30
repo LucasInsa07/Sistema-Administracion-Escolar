@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
 import { createStudent, updateStudent } from "@/lib/api/students"
 import type { Student, CreateStudentRequest } from "@/lib/types"
 
@@ -28,12 +27,7 @@ export function StudentDialog({ open, onClose, student }: StudentDialogProps) {
   const [formData, setFormData] = useState<CreateStudentRequest>({
     nombre: "",
     apellido: "",
-    dni: "",
     email: "",
-    telefono: "",
-    direccion: "",
-    fechaNacimiento: "",
-    activo: true,
   })
   const [loading, setLoading] = useState(false)
 
@@ -42,23 +36,13 @@ export function StudentDialog({ open, onClose, student }: StudentDialogProps) {
       setFormData({
         nombre: student.nombre,
         apellido: student.apellido,
-        dni: student.dni,
         email: student.email,
-        telefono: student.telefono,
-        direccion: student.direccion,
-        fechaNacimiento: student.fechaNacimiento,
-        activo: student.activo,
       })
     } else {
       setFormData({
         nombre: "",
         apellido: "",
-        dni: "",
         email: "",
-        telefono: "",
-        direccion: "",
-        fechaNacimiento: "",
-        activo: true,
       })
     }
   }, [student, open])
@@ -117,15 +101,6 @@ export function StudentDialog({ open, onClose, student }: StudentDialogProps) {
               </div>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="dni">DNI</Label>
-              <Input
-                id="dni"
-                value={formData.dni}
-                onChange={(e) => handleInputChange("dni", e.target.value)}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
@@ -134,40 +109,6 @@ export function StudentDialog({ open, onClose, student }: StudentDialogProps) {
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 required
               />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="telefono">Teléfono</Label>
-              <Input
-                id="telefono"
-                value={formData.telefono}
-                onChange={(e) => handleInputChange("telefono", e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="direccion">Dirección</Label>
-              <Input
-                id="direccion"
-                value={formData.direccion}
-                onChange={(e) => handleInputChange("direccion", e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="fechaNacimiento">Fecha de Nacimiento</Label>
-              <Input
-                id="fechaNacimiento"
-                type="date"
-                value={formData.fechaNacimiento}
-                onChange={(e) => handleInputChange("fechaNacimiento", e.target.value)}
-                required
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="activo"
-                checked={formData.activo}
-                onCheckedChange={(checked) => handleInputChange("activo", checked)}
-              />
-              <Label htmlFor="activo">Alumno activo</Label>
             </div>
           </div>
           <DialogFooter>

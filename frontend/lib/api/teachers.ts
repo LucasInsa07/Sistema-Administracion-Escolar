@@ -1,56 +1,32 @@
 import type { Teacher, CreateTeacherRequest } from "@/lib/types"
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api"
+import { apiFetch } from "@/lib/api/client"
 
 export async function getTeachers(): Promise<Teacher[]> {
-  const response = await fetch(`${API_BASE_URL}/profesores`)
-  if (!response.ok) {
-    throw new Error("Failed to fetch teachers")
-  }
-  return response.json()
+  const data = await apiFetch(`/profesores`)
+  return data as Teacher[]
 }
 
 export async function getTeacher(id: number): Promise<Teacher> {
-  const response = await fetch(`${API_BASE_URL}/profesores/${id}`)
-  if (!response.ok) {
-    throw new Error("Failed to fetch teacher")
-  }
-  return response.json()
+  const data = await apiFetch(`/profesores/${id}`)
+  return data as Teacher
 }
 
 export async function createTeacher(teacher: CreateTeacherRequest): Promise<Teacher> {
-  const response = await fetch(`${API_BASE_URL}/profesores`, {
+  const data = await apiFetch(`/profesores`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(teacher),
   })
-  if (!response.ok) {
-    throw new Error("Failed to create teacher")
-  }
-  return response.json()
+  return data as Teacher
 }
 
 export async function updateTeacher(id: number, teacher: CreateTeacherRequest): Promise<Teacher> {
-  const response = await fetch(`${API_BASE_URL}/profesores/${id}`, {
+  const data = await apiFetch(`/profesores/${id}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(teacher),
   })
-  if (!response.ok) {
-    throw new Error("Failed to update teacher")
-  }
-  return response.json()
+  return data as Teacher
 }
 
 export async function deleteTeacher(id: number): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/profesores/${id}`, {
-    method: "DELETE",
-  })
-  if (!response.ok) {
-    throw new Error("Failed to delete teacher")
-  }
+  await apiFetch(`/profesores/${id}`, { method: "DELETE" })
 }

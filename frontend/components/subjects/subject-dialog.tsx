@@ -14,8 +14,6 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createSubject, updateSubject } from "@/lib/api/subjects"
 import { getTeachers } from "@/lib/api/teachers"
@@ -30,9 +28,7 @@ interface SubjectDialogProps {
 export function SubjectDialog({ open, onClose, subject }: SubjectDialogProps) {
   const [formData, setFormData] = useState<CreateSubjectRequest>({
     nombre: "",
-    descripcion: "",
     profesorId: 0,
-    activo: true,
   })
   const [teachers, setTeachers] = useState<Teacher[]>([])
   const [loading, setLoading] = useState(false)
@@ -48,16 +44,12 @@ export function SubjectDialog({ open, onClose, subject }: SubjectDialogProps) {
     if (subject) {
       setFormData({
         nombre: subject.nombre,
-        descripcion: subject.descripcion,
-        profesorId: subject.profesor.id,
-        activo: subject.activo,
+        profesorId: subject.profesorId || 0,
       })
     } else {
       setFormData({
         nombre: "",
-        descripcion: "",
         profesorId: 0,
-        activo: true,
       })
     }
   }, [subject, open])
@@ -66,7 +58,7 @@ export function SubjectDialog({ open, onClose, subject }: SubjectDialogProps) {
     try {
       setLoadingTeachers(true)
       const data = await getTeachers()
-      setTeachers(data.filter((teacher) => teacher.activo))
+      setTeachers(data)
     } catch (error) {
       console.error("Error loading teachers:", error)
     } finally {
@@ -97,7 +89,7 @@ export function SubjectDialog({ open, onClose, subject }: SubjectDialogProps) {
     }
   }
 
-  const handleInputChange = (field: keyof CreateSubjectRequest, value: string | number | boolean) => {
+  const handleInputChange = (field: keyof CreateSubjectRequest, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
@@ -123,23 +115,15 @@ export function SubjectDialog({ open, onClose, subject }: SubjectDialogProps) {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="descripcion">Descripción</Label>
-              <Textarea
-                id="descripcion"
-                value={formData.descripcion}
-                onChange={(e) => handleInputChange("descripcion", e.target.value)}
-                placeholder="Descripción de la materia y sus contenidos..."
-                rows={3}
-              />
-            </div>
-            <div className="grid gap-2">
               <Label htmlFor="profesor">Profesor Asignado</Label>
               {loadingTeachers ? (
                 <div className="text-sm text-muted-foreground">Cargando profesores...</div>
               ) : (
                 <Select
                   value={formData.profesorId.toString()}
-                  onValueChange={(value) => handleInputChange("profesorId", Number.parseInt(value))}
+                  onValueChange={(teacherId) => {
+                    handleInputChange("profesorId", Number(teacherId))
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar profesor" />
@@ -147,20 +131,12 @@ export function SubjectDialog({ open, onClose, subject }: SubjectDialogProps) {
                   <SelectContent>
                     {teachers.map((teacher) => (
                       <SelectItem key={teacher.id} value={teacher.id.toString()}>
-                        {teacher.nombre} {teacher.apellido} - {teacher.especialidad}
+                        {teacher.nombre} {teacher.apellido}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               )}
-            </div>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="activo"
-                checked={formData.activo}
-                onCheckedChange={(checked) => handleInputChange("activo", checked)}
-              />
-              <Label htmlFor="activo">Materia activa</Label>
             </div>
           </div>
           <DialogFooter>

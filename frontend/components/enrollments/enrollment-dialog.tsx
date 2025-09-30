@@ -72,7 +72,7 @@ export function EnrollmentDialog({ open, onClose, enrollment }: EnrollmentDialog
     try {
       setLoadingData(true)
       const [studentsData, coursesData] = await Promise.all([getStudents(), getCourses()])
-      setStudents(studentsData.filter((student) => student.activo))
+      setStudents(studentsData)
       setCourses(coursesData.filter((course) => course.activo))
     } catch (error) {
       console.error("Error loading data:", error)
@@ -137,7 +137,7 @@ export function EnrollmentDialog({ open, onClose, enrollment }: EnrollmentDialog
                   <SelectContent>
                     {students.map((student) => (
                       <SelectItem key={student.id} value={student.id.toString()}>
-                        {student.nombre} {student.apellido} - DNI: {student.dni}
+                        {student.nombre} {student.apellido}
                       </SelectItem>
                     ))}
                   </SelectContent>

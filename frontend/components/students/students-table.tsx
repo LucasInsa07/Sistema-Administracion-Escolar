@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Search, Plus, Edit, Trash2 } from "lucide-react"
 import { StudentDialog } from "./student-dialog"
 import { getStudents, deleteStudent } from "@/lib/api/students"
@@ -28,7 +27,6 @@ export function StudentsTable() {
       (student) =>
         student.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
         student.apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.dni.includes(searchTerm) ||
         student.email.toLowerCase().includes(searchTerm.toLowerCase()),
     )
     setFilteredStudents(filtered)
@@ -104,17 +102,14 @@ export function StudentsTable() {
               <TableRow>
                 <TableHead>ID</TableHead>
                 <TableHead>Nombre</TableHead>
-                <TableHead>DNI</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Teléfono</TableHead>
-                <TableHead>Estado</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredStudents.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
+                  <TableCell colSpan={4} className="text-center py-8">
                     {searchTerm ? "No se encontraron alumnos" : "No hay alumnos registrados"}
                   </TableCell>
                 </TableRow>
@@ -125,14 +120,7 @@ export function StudentsTable() {
                     <TableCell className="font-medium">
                       {student.nombre} {student.apellido}
                     </TableCell>
-                    <TableCell>{student.dni}</TableCell>
                     <TableCell>{student.email}</TableCell>
-                    <TableCell>{student.telefono}</TableCell>
-                    <TableCell>
-                      <Badge variant={student.activo ? "default" : "secondary"}>
-                        {student.activo ? "Activo" : "Inactivo"}
-                      </Badge>
-                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Button variant="ghost" size="sm" onClick={() => handleEdit(student)}>

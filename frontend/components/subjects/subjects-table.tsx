@@ -5,14 +5,16 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+
 import { Search, Plus, Edit, Trash2 } from "lucide-react"
 import { SubjectDialog } from "./subject-dialog"
 import { getSubjects, deleteSubject } from "@/lib/api/subjects"
-import type { Subject } from "@/lib/types"
+import { getTeachers } from "@/lib/api/teachers"
+import type { Subject, Teacher } from "@/lib/types"
 
 export function SubjectsTable() {
   const [subjects, setSubjects] = useState<Subject[]>([])
+  const [teachers, setTeachers] = useState<Teacher[]>([])
   const [filteredSubjects, setFilteredSubjects] = useState<Subject[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -20,29 +22,39 @@ export function SubjectsTable() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadSubjects()
+    loadData()
   }, [])
 
   useEffect(() => {
-    const filtered = subjects.filter(
-      (subject) =>
+    const filtered = subjects.filter((subject) => {
+      const teacherName = `${subject.profesorNombre} ${subject.profesorApellido}`
+      
+      return (
         subject.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        subject.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        `${subject.profesor.nombre} ${subject.profesor.apellido}`.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
+        teacherName.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    })
     setFilteredSubjects(filtered)
   }, [subjects, searchTerm])
 
-  const loadSubjects = async () => {
+  const loadData = async () => {
     try {
       setLoading(true)
-      const data = await getSubjects()
-      setSubjects(data)
+      const [subjectsData, teachersData] = await Promise.all([
+        getSubjects(),
+        getTeachers()
+      ])
+      setSubjects(subjectsData)
+      setTeachers(teachersData)
     } catch (error) {
-      console.error("Error loading subjects:", error)
+      console.error("Error loading data:", error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const getTeacherById = (teacherId?: number): Teacher | undefined => {
+    return teacherId ? teachers.find(t => t.id === teacherId) : undefined
   }
 
   const handleEdit = (subject: Subject) => {
@@ -54,7 +66,7 @@ export function SubjectsTable() {
     if (confirm("¿Está seguro de que desea eliminar esta materia?")) {
       try {
         await deleteSubject(id)
-        await loadSubjects()
+        await loadData()
       } catch (error) {
         console.error("Error deleting subject:", error)
       }
@@ -64,7 +76,7 @@ export function SubjectsTable() {
   const handleDialogClose = () => {
     setIsDialogOpen(false)
     setSelectedSubject(null)
-    loadSubjects()
+    loadData()
   }
 
   return (
@@ -84,7 +96,7 @@ export function SubjectsTable() {
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar por materia, descripción o profesor..."
+              placeholder="Buscar por nombre de materia o profesor..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-8"
@@ -103,17 +115,14 @@ export function SubjectsTable() {
               <TableRow>
                 <TableHead>ID</TableHead>
                 <TableHead>Materia</TableHead>
-                <TableHead>Descripción</TableHead>
                 <TableHead>Profesor</TableHead>
-                <TableHead>Especialidad</TableHead>
-                <TableHead>Estado</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredSubjects.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
+                  <TableCell colSpan={4} className="text-center py-8">
                     {searchTerm ? "No se encontraron materias" : "No hay materias registradas"}
                   </TableCell>
                 </TableRow>
@@ -122,17 +131,8 @@ export function SubjectsTable() {
                   <TableRow key={subject.id}>
                     <TableCell className="font-mono text-sm text-muted-foreground">#{subject.id}</TableCell>
                     <TableCell className="font-medium">{subject.nombre}</TableCell>
-                    <TableCell className="max-w-xs truncate">{subject.descripcion}</TableCell>
                     <TableCell>
-                      {subject.profesor.nombre} {subject.profesor.apellido}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{subject.profesor.especialidad}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={subject.activo ? "default" : "secondary"}>
-                        {subject.activo ? "Activa" : "Inactiva"}
-                      </Badge>
+                      {subject.profesorNombre} {subject.profesorApellido}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">

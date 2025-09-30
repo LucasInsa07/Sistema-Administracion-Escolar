@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.demo.sistema_gestion_escolar.dto.MateriaRequestDTO;
+import com.demo.sistema_gestion_escolar.dto.MateriaResponseDTO;
 import com.demo.sistema_gestion_escolar.model.Materia;
 import com.demo.sistema_gestion_escolar.service.MateriaService;
 
@@ -28,13 +30,13 @@ public class MateriaController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Materia> crear(@Valid @RequestBody Materia materia) {
-        return ResponseEntity.ok(materiaService.crear(materia));
+    public ResponseEntity<Materia> crear(@Valid @RequestBody MateriaRequestDTO materiaDto) {
+        return ResponseEntity.ok(materiaService.crear(materiaDto));
     }
 
     @GetMapping
-    public List<Materia> obtenerTodas() {
-        return materiaService.obtenerTodas();
+    public List<MateriaResponseDTO> obtenerTodas() {
+        return materiaService.obtenerTodasDTO();
     }
 
     @GetMapping("/{id}")
@@ -46,9 +48,9 @@ public class MateriaController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Materia> actualizar(@PathVariable Long id, @Valid @RequestBody Materia materia) {
+    public ResponseEntity<Materia> actualizar(@PathVariable Long id, @Valid @RequestBody MateriaRequestDTO materiaDto) {
         try {
-            return ResponseEntity.ok(materiaService.actualizar(id, materia));
+            return ResponseEntity.ok(materiaService.actualizar(id, materiaDto));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }

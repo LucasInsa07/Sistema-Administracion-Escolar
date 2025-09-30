@@ -33,6 +33,10 @@ Permite gestionar alumnos, profesores, materias, cursos, inscripciones y dictado
 - **Relaciones**: Cada materia está asociada a un profesor
 - **Endpoints**: CRUD completo con validación de relaciones
 - **Seguridad**: Protegido para operaciones de escritura
+- **DTOs implementados**: 
+  - MateriaRequestDTO para crear/actualizar (recibe profesorId)
+  - MateriaResponseDTO para consultas (incluye datos completos del profesor)
+- **Características**: Maneja @JsonBackReference para evitar referencias circulares
 
 ### 1.4 CursoController (/api/v1/cursos)
 - **Propósito**: Gestión de cursos (año, división)
@@ -146,6 +150,18 @@ Permite gestionar alumnos, profesores, materias, cursos, inscripciones y dictado
 ### 3.4 InscripcionResponseDTO
 - **Propósito**: Datos de salida para consultas de inscripciones
 - **Características**: Incluye información completa de alumno y curso
+
+### 3.5 MateriaRequestDTO
+- **Propósito**: Datos de entrada para crear/actualizar materias
+- **Campos**: nombre, profesorId
+- **Validaciones**: @NotBlank para nombre, @NotNull para profesorId
+- **Características**: Recibe solo ID del profesor para eficiencia
+
+### 3.6 MateriaResponseDTO
+- **Propósito**: Datos de salida para consultas de materias
+- **Campos**: id, nombre, profesorId, profesorNombre, profesorApellido
+- **Características**: Incluye datos completos del profesor sin referencias circulares
+- **Uso**: Resuelve problema de @JsonBackReference en relaciones bidireccionales
 
 ---
 
