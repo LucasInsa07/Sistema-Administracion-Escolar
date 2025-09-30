@@ -1,0 +1,403 @@
+# DOCUMENTACIÓN COMPLETA DEL SISTEMA DE GESTIÓN ESCOLAR
+
+## RESUMEN GENERAL
+Sistema de administración académica desarrollado con Spring Boot (backend) y Next.js (frontend).
+Permite gestionar alumnos, profesores, materias, cursos, inscripciones y dictados con autenticación JWT.
+
+---
+
+## 1. CAPA CONTROLLERS (Controladores REST)
+
+### 1.1 AlumnoController (/api/v1/alumnos)
+- **Propósito**: Gestión CRUD de estudiantes
+- **Endpoints principales**:
+  - GET /api/v1/alumnos - Listar todos los alumnos
+  - GET /api/v1/alumnos/{id} - Obtener alumno por ID
+  - POST /api/v1/alumnos - Crear alumno individual
+  - POST /api/v1/alumnos/lote - Crear múltiples alumnos
+  - PUT /api/v1/alumnos/{id} - Actualizar alumno
+  - DELETE /api/v1/alumnos/{id} - Eliminar alumno (requiere rol ADMIN)
+- **Características especiales**:
+  - Usa DTOs para entrada y salida de datos
+  - Implementa creación en lote
+  - Seguridad con @PreAuthorize para operaciones críticas
+
+### 1.2 ProfesorController (/api/v1/profesores)
+- **Propósito**: Gestión CRUD de profesores
+- **Endpoints**: CRUD completo similar a AlumnoController
+- **Seguridad**: Operaciones de escritura requieren rol ADMIN
+- **Particularidades**: Trabaja directamente con entidades Profesor
+
+### 1.3 MateriaController (/api/v1/materias)
+- **Propósito**: Gestión de materias académicas
+- **Relaciones**: Cada materia está asociada a un profesor
+- **Endpoints**: CRUD completo con validación de relaciones
+- **Seguridad**: Protegido para operaciones de escritura
+
+### 1.4 CursoController (/api/v1/cursos)
+- **Propósito**: Gestión de cursos (año, división)
+- **Características**: Maneja información de cursos como "1ro A", "2do B"
+- **Endpoints**: CRUD completo con validaciones
+
+### 1.5 InscripcionController (/api/v1/inscripciones)
+- **Propósito**: Gestión de inscripciones alumno-curso
+- **Características especiales**:
+  - Maneja estados: ACTIVO, INACTIVO, SUSPENDIDO
+  - Usa DTOs para entrada y salida
+  - Valida existencia de alumno y curso antes de crear
+- **Relaciones**: Conecta alumnos con cursos
+
+### 1.6 DictadoController (/api/v1/dictados)
+- **Propósito**: Gestión de materias dictadas en cursos específicos
+- **Características especiales**:
+  - Implementa DTOs personalizados para evitar recursión JSON
+  - Manejo robusto de errores con try-catch
+  - Respuestas estructuradas para errores
+- **Relaciones**: Conecta materias con cursos
+
+### 1.7 AdministradorController (/api/v1/administradores)
+- **Propósito**: Gestión de usuarios administradores
+- **Características**: CRUD básico para administradores del sistema
+- **Validaciones**: Normalización automática de roles
+
+### 1.8 AuthController (/api/v1/auth)
+- **Propósito**: Autenticación y generación de tokens JWT
+- **Endpoint principal**: POST /api/v1/auth/login
+- **Funcionalidades**:
+  - Validación de credenciales
+  - Generación de tokens JWT
+  - Inclusión de roles en el token
+- **Seguridad**: Comparación directa de contraseñas (pendiente implementar BCrypt)
+
+---
+
+## 2. CAPA MODELS (Entidades de Dominio)
+
+### 2.1 BaseEntity
+- **Propósito**: Clase base para auditoría
+- **Campos comunes**: id, fechaCreacion, fechaActualizacion
+- **Anotaciones**: @MappedSuperclass para herencia
+
+### 2.2 Alumno extends BaseEntity
+- **Campos**: nombre, apellido, email
+- **Validaciones**: Email único, campos obligatorios
+- **Relaciones**: OneToMany con Inscripcion
+
+### 2.3 Profesor extends BaseEntity
+- **Campos**: nombre, apellido, email
+- **Relaciones**: OneToMany con Materia
+- **Características**: Base para asignación de materias
+
+### 2.4 Materia extends BaseEntity
+- **Campos**: nombre
+- **Relaciones**:
+  - ManyToOne con Profesor (@JsonBackReference)
+  - OneToMany con Dictado (@JsonManagedReference)
+- **Características**: Control de referencias para evitar bucles JSON
+
+### 2.5 Curso extends BaseEntity
+- **Campos**: nombre, descripcion, anio, division, activo
+- **Relaciones**: OneToMany con Dictado e Inscripcion
+- **Validaciones**: Campos obligatorios con longitudes específicas
+
+### 2.6 Dictado extends BaseEntity
+- **Campos**: fechaInicio, fechaFin
+- **Relaciones**:
+  - ManyToOne con Curso
+  - ManyToOne con Materia
+- **Propósito**: Tabla de relación entre materia y curso
+- **Características**: Permite saber qué materias se dictan en qué cursos
+
+### 2.7 Inscripcion extends BaseEntity
+- **Campos**: fechaInscripcion, estado
+- **Estados**: ACTIVO, INACTIVO, SUSPENDIDO
+- **Relaciones**:
+  - ManyToOne con Alumno
+  - ManyToOne con Curso
+- **Propósito**: Registra qué alumnos cursan en qué cursos
+
+### 2.8 Administrador extends BaseEntity
+- **Campos**: usuario, contrasena, rol
+- **Validaciones**:
+  - Usuario único
+  - Roles válidos: ADMIN, ALUMNO, PADRE
+  - Normalización automática con @PrePersist/@PreUpdate
+- **Seguridad**: Base para autenticación del sistema
+
+---
+
+## 3. CAPA DTOS (Data Transfer Objects)
+
+### 3.1 AlumnoRequestDTO
+- **Propósito**: Datos de entrada para crear/actualizar alumnos
+- **Campos**: nombre, apellido, email
+- **Validaciones**: @NotBlank en campos obligatorios
+
+### 3.2 AlumnoResponseDTO
+- **Propósito**: Datos de salida para consultas de alumnos
+- **Campos**: id, nombre, apellido, email
+- **Características**: Evita exponer información sensible
+
+### 3.3 InscripcionRequestDTO
+- **Propósito**: Datos de entrada para inscripciones
+- **Campos**: alumnoId, cursoId, estado, fechaInscripcion
+- **Validaciones**: Referencias válidas y estados permitidos
+
+### 3.4 InscripcionResponseDTO
+- **Propósito**: Datos de salida para consultas de inscripciones
+- **Características**: Incluye información completa de alumno y curso
+
+---
+
+## 4. CAPA REPOSITORY (Acceso a Datos)
+
+### 4.1 Patrón General
+- **Base**: Todos extienden JpaRepository<Entidad, Long>
+- **Funcionalidades**: CRUD automático proporcionado por Spring Data JPA
+- **Convenciones**: Métodos de consulta por convención de nombres
+
+### 4.2 Repositorios Específicos:
+- **AlumnoRepository**: Operaciones CRUD para alumnos
+- **ProfesorRepository**: Gestión de profesores
+- **MateriaRepository**: Manejo de materias
+- **CursoRepository**: Operaciones con cursos
+- **InscripcionRepository**: Gestión de inscripciones
+- **DictadoRepository**: Manejo de dictados
+- **AdministradorRepository**: 
+  - Método especial: findByUsuario(String usuario)
+  - Para autenticación de administradores
+
+---
+
+## 5. CAPA SERVICES (Lógica de Negocio)
+
+### 5.1 AlumnoService
+- **Funcionalidades**:
+  - CRUD completo de alumnos
+  - Creación en lote con saveAll()
+  - Validación de existencia para actualizaciones
+- **Manejo de errores**: RuntimeException para entidades no encontradas
+
+### 5.2 ProfesorService
+- **Funcionalidades**: CRUD estándar con validaciones
+- **Características**: Actualización selectiva de campos
+
+### 5.3 MateriaService
+- **Funcionalidades**: Gestión de materias con relación a profesores
+- **Validaciones**: Verificación de existencia de profesor asignado
+
+### 5.4 CursoService
+- **Funcionalidades**: CRUD de cursos con validaciones de negocio
+
+### 5.5 InscripcionService
+- **Funcionalidades**: 
+  - Gestión de inscripciones alumno-curso
+  - Validación de estados permitidos
+  - Control de duplicados
+
+### 5.6 DictadoService
+- **Funcionalidades especiales**:
+  - Métodos de conversión a DTO para evitar recursión JSON
+  - obtenerDictadoDTO(): Convierte entidad a mapa de datos
+  - obtenerDictadosDTO(): Procesa listas completas
+- **Características**: Soluciona problemas de serialización con relaciones circulares
+
+### 5.7 AdministradorService
+- **Funcionalidades**: CRUD básico de administradores
+- **Validaciones**: Normalización de roles
+
+---
+
+## 6. CAPA SECURITY (Seguridad)
+
+### 6.1 JwtService
+- **Propósito**: Manejo de tokens JWT
+- **Funcionalidades**:
+  - generateToken(): Crea tokens con claims personalizados
+  - parseToken(): Valida y extrae información de tokens
+- **Configuración**: Clave secreta y tiempo de expiración configurable
+- **Algoritmo**: HS256 para firma de tokens
+
+### 6.2 JwtAuthenticationFilter
+- **Propósito**: Filtro de autenticación por cada request
+- **Funcionalidades**:
+  - Extrae token del header Authorization
+  - Valida token y extrae usuario/rol
+  - Configura SecurityContext para la sesión
+- **Manejo de errores**: Limpia contexto si token es inválido
+- **Patrón**: OncePerRequestFilter para ejecución única por request
+
+### 6.3 SecurityConfig
+- **Propósito**: Configuración global de seguridad
+- **Características**:
+  - Deshabilita CSRF para APIs REST
+  - Configura política STATELESS (sin sesiones)
+  - Permite acceso público a endpoints de autenticación y documentación
+  - Requiere autenticación para operaciones de escritura
+- **Filtros**: Integra JwtAuthenticationFilter antes de UsernamePasswordAuthenticationFilter
+
+---
+
+## 7. CAPA ADVICE (Manejo Global de Errores)
+
+### 7.1 GlobalExceptionHandler
+- **Propósito**: Manejo centralizado de excepciones
+- **Funcionalidades**:
+  - @ExceptionHandler(MethodArgumentNotValidException): Maneja errores de validación
+  - @ExceptionHandler(RuntimeException): Captura errores de negocio
+- **Respuestas estructuradas**:
+  - Formato JSON consistente para todos los errores
+  - Incluye mensaje descriptivo y detalles de validación
+- **HTTP Status**: Mapeo apropiado de excepciones a códigos HTTP
+
+---
+
+## 8. CONFIGURACIÓN ADICIONAL
+
+### 8.1 WebConfig
+- **Propósito**: Configuración CORS
+- **Funcionalidades**:
+  - Permite requests desde frontend (localhost:3000)
+  - Configura métodos HTTP permitidos
+  - Habilita credenciales para autenticación
+
+---
+
+## 9. FRONTEND (Next.js)
+
+### 9.1 Estructura de API
+- **Base URL**: Configurable via NEXT_PUBLIC_API_URL
+- **Módulos por entidad**: subjects.ts, dictados.ts, etc.
+- **Funciones CRUD**: getAll, getById, create, update, delete
+
+### 9.2 Componentes Principales
+- **Tablas de datos**: Con paginación y filtros
+- **Diálogos de edición**: Formularios modales para CRUD
+- **Headers**: Navegación y breadcrumbs
+- **Autenticación**: Login y manejo de tokens
+
+### 9.3 Tipos TypeScript
+- **Interfaces**: Definiciones precisas para todas las entidades
+- **Request DTOs**: Para operaciones de creación/actualización
+- **Consistencia**: Tipos alineados con el backend Java
+
+---
+
+## 10. FLUJO DE DATOS COMPLETO
+
+### 10.1 Ejemplo: Creación de Dictado
+1. **Frontend**: Usuario completa formulario en DictadoDialog
+2. **API Call**: POST a /api/v1/dictados con CreateDictadoRequest
+3. **Controller**: DictadoController.crear() recibe request
+4. **Security**: JwtAuthenticationFilter valida token ADMIN
+5. **Service**: DictadoService.crear() aplica lógica de negocio
+6. **Repository**: DictadoRepository.save() persiste en BD
+7. **Response**: DTO personalizado evita recursión JSON
+8. **Frontend**: Actualiza lista y cierra diálogo
+
+### 10.2 Manejo de Errores
+1. **Validación**: @Valid en controllers
+2. **Negocio**: RuntimeException en services
+3. **Global**: GlobalExceptionHandler captura y formatea
+4. **Frontend**: Muestra mensajes de error apropiados
+
+---
+
+## 11. CARACTERÍSTICAS TÉCNICAS DESTACADAS
+
+### 11.1 Arquitectura
+- **Separación de responsabilidades**: Capas bien definidas
+- **Inyección de dependencias**: @Autowired y constructor injection
+- **Configuración**: Properties externalizadas
+
+### 11.2 Persistencia
+- **JPA/Hibernate**: Mapeo objeto-relacional
+- **Relaciones**: ManyToOne, OneToMany correctamente configuradas
+- **Auditoría**: Timestamps automáticos en BaseEntity
+
+### 11.3 Seguridad
+- **JWT stateless**: Sin sesiones del lado servidor
+- **Autorización**: Roles y permisos granulares
+- **CORS**: Configurado para desarrollo y producción
+
+### 11.4 Calidad de Código
+- **DTOs**: Separación entre modelo interno y API
+- **Validaciones**: Tanto en backend como frontend
+- **Manejo de errores**: Centralizado y consistente
+- **Documentación**: API bien documentada
+
+---
+
+## 12. PUNTOS DE MEJORA IDENTIFICADOS
+
+### 12.1 Seguridad
+- [ ] Implementar BCrypt para hash de contraseñas
+- [ ] Refresh tokens para sesiones largas
+- [ ] Rate limiting para endpoints públicos
+
+### 12.2 Funcionalidades
+- [ ] Paginación en endpoints que retornan listas
+- [ ] Búsqueda avanzada con filtros
+- [ ] Validaciones de negocio más robustas
+
+### 12.3 Monitoreo
+- [ ] Logging estructurado
+- [ ] Métricas de performance
+- [ ] Health checks detallados
+
+---
+
+## 13. CASOS DE USO PRINCIPALES
+
+### 13.1 Gestión Académica
+1. **Crear estructura**: Profesores → Materias → Cursos
+2. **Establecer dictado**: Materia + Curso = Dictado
+3. **Inscribir estudiantes**: Alumno + Curso = Inscripción
+4. **Consultar información**: Reportes y listados
+
+### 13.2 Administración
+1. **Autenticación**: Login de administradores
+2. **CRUD entidades**: Gestión completa de datos
+3. **Relaciones**: Manejo de asociaciones entre entidades
+
+---
+
+## 14. ANÁLISIS DETALLADO DEL CÓDIGO
+
+### 14.1 Patrones de Diseño Implementados
+- **Repository Pattern**: Separación de lógica de acceso a datos
+- **DTO Pattern**: Transferencia de datos sin exponer entidades internas
+- **Dependency Injection**: Inversión de control con Spring
+- **Filter Pattern**: JwtAuthenticationFilter para autenticación
+- **Exception Handler Pattern**: Manejo centralizado de errores
+
+### 14.2 Buenas Prácticas Aplicadas
+- **Single Responsibility**: Cada clase tiene una responsabilidad específica
+- **Open/Closed**: Extensible a través de herencia (BaseEntity)
+- **Dependency Inversion**: Depende de abstracciones (interfaces Repository)
+- **Separation of Concerns**: Capas claramente separadas
+- **SOLID Principles**: Aplicación consistente de principios SOLID
+
+### 14.3 Estructura de Base de Datos Inferida
+```
+ADMINISTRADORES (id, usuario, contrasena, rol, fecha_creacion, fecha_actualizacion)
+ALUMNOS (id, nombre, apellido, email, fecha_creacion, fecha_actualizacion)
+PROFESORES (id, nombre, apellido, email, fecha_creacion, fecha_actualizacion)
+CURSOS (id, nombre, descripcion, anio, division, activo, fecha_creacion, fecha_actualizacion)
+MATERIAS (id, nombre, profesor_id, fecha_creacion, fecha_actualizacion)
+DICTADOS (id, fecha_inicio, fecha_fin, curso_id, materia_id, fecha_creacion, fecha_actualizacion)
+INSCRIPCIONES (id, fecha_inscripcion, estado, alumno_id, curso_id, fecha_creacion, fecha_actualizacion)
+```
+
+### 14.4 Relaciones Entre Entidades
+- **Profesor → Materia**: 1:N (Un profesor puede tener múltiples materias)
+- **Curso → Dictado**: 1:N (Un curso puede tener múltiples dictados)
+- **Materia → Dictado**: 1:N (Una materia puede dictarse en múltiples cursos)
+- **Alumno → Inscripcion**: 1:N (Un alumno puede tener múltiples inscripciones)
+- **Curso → Inscripcion**: 1:N (Un curso puede tener múltiples inscripciones)
+
+---
+
+Este sistema implementa una arquitectura limpia y escalable, con separación clara de responsabilidades y buenas prácticas de desarrollo. La integración frontend-backend está bien lograda, con tipos consistentes y manejo robusto de errores.
+
+El código muestra un nivel de madurez técnica adecuado para un sistema de gestión académica, con patrones reconocidos de la industria y estructura modular que facilita el mantenimiento y la extensión de funcionalidades.
