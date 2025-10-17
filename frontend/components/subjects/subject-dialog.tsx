@@ -45,11 +45,17 @@ export function SubjectDialog({ open, onClose, subject }: SubjectDialogProps) {
       setFormData({
         nombre: subject.nombre,
         profesorId: subject.profesorId || 0,
+        diaSemana: (subject as any).diaSemana || "",
+        horaInicio: (subject as any).horaInicio || "",
+        horaFin: (subject as any).horaFin || "",
       })
     } else {
       setFormData({
         nombre: "",
         profesorId: 0,
+        diaSemana: "",
+        horaInicio: "",
+        horaFin: "",
       })
     }
   }, [subject, open])
@@ -137,6 +143,38 @@ export function SubjectDialog({ open, onClose, subject }: SubjectDialogProps) {
                   </SelectContent>
                 </Select>
               )}
+            </div>
+          
+            {/* Horario */}
+            <div className="grid gap-2">
+              <Label htmlFor="diaSemana">Día de la semana</Label>
+              <Select
+                value={formData.diaSemana}
+                onValueChange={(v) => handleInputChange("diaSemana", v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar día (opcional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Lunes">Lunes</SelectItem>
+                  <SelectItem value="Martes">Martes</SelectItem>
+                  <SelectItem value="Miércoles">Miércoles</SelectItem>
+                  <SelectItem value="Jueves">Jueves</SelectItem>
+                  <SelectItem value="Viernes">Viernes</SelectItem>
+                  <SelectItem value="Sábado">Sábado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="horaInicio">Hora de inicio</Label>
+                <Input id="horaInicio" type="time" value={formData.horaInicio as string | undefined} onChange={(e) => handleInputChange("horaInicio", e.target.value)} />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="horaFin">Hora de fin</Label>
+                <Input id="horaFin" type="time" value={formData.horaFin as string | undefined} onChange={(e) => handleInputChange("horaFin", e.target.value)} />
+              </div>
             </div>
           </div>
           <DialogFooter>

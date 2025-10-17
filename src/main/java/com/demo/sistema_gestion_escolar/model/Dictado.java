@@ -20,6 +20,9 @@ public class Dictado extends BaseEntity {
     @Column(nullable = false)
     private LocalDate fechaFin;
 
+    @Column(nullable = false)
+    private Boolean activo = true;
+
     @ManyToOne
     @JoinColumn(name = "curso_id", nullable = false)
     @JsonBackReference(value = "curso-dictado")
@@ -45,6 +48,14 @@ public class Dictado extends BaseEntity {
 
     public void setFechaFin(LocalDate fechaFin) {
         this.fechaFin = fechaFin;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 
     public Curso getCurso() {

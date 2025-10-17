@@ -55,10 +55,10 @@ export function DictadosTable({ dictados, loading, onEdit, onDelete }: DictadosT
               dictados.map((dictado) => (
                 <TableRow key={dictado.id}>
                   <TableCell className="font-medium">#{dictado.id}</TableCell>
-                  <TableCell>{dictado.materia.nombre}</TableCell>
-                  <TableCell>{dictado.curso.nombre}</TableCell>
+                  <TableCell>{dictado.materiaNombre}</TableCell>
+                  <TableCell>{dictado.cursoNombre}</TableCell>
                   <TableCell>
-                    {dictado.materia.profesor.nombre} {dictado.materia.profesor.apellido}
+                    {dictado.materiaProfesorNombre} {dictado.materiaProfesorApellido}
                   </TableCell>
                   <TableCell>
                     <Badge variant={dictado.activo ? "default" : "secondary"}>

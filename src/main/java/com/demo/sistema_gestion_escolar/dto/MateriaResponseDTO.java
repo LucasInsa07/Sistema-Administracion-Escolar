@@ -7,6 +7,9 @@ public class MateriaResponseDTO {
     private Long profesorId;
     private String profesorNombre;
     private String profesorApellido;
+    private String diaSemana;
+    private String horaInicio;
+    private String horaFin;
 
     // Constructores
     public MateriaResponseDTO() {}
@@ -17,6 +20,17 @@ public class MateriaResponseDTO {
         this.profesorId = profesorId;
         this.profesorNombre = profesorNombre;
         this.profesorApellido = profesorApellido;
+    }
+
+    public MateriaResponseDTO(Long id, String nombre, Long profesorId, String profesorNombre, String profesorApellido, String diaSemana, String horaInicio, String horaFin) {
+        this.id = id;
+        this.nombre = nombre;
+        this.profesorId = profesorId;
+        this.profesorNombre = profesorNombre;
+        this.profesorApellido = profesorApellido;
+        this.diaSemana = diaSemana;
+        this.horaInicio = horaInicio;
+        this.horaFin = horaFin;
     }
 
     // Getters y setters
@@ -58,5 +72,29 @@ public class MateriaResponseDTO {
 
     public void setProfesorApellido(String profesorApellido) {
         this.profesorApellido = profesorApellido;
+    }
+
+    public String getDiaSemana() {
+        return diaSemana;
+    }
+
+    public void setDiaSemana(String diaSemana) {
+        this.diaSemana = diaSemana;
+    }
+
+    public String getHoraInicio() {
+        return horaInicio;
+    }
+
+    public void setHoraInicio(String horaInicio) {
+        this.horaInicio = horaInicio;
+    }
+
+    public String getHoraFin() {
+        return horaFin;
+    }
+
+    public void setHoraFin(String horaFin) {
+        this.horaFin = horaFin;
     }
 }

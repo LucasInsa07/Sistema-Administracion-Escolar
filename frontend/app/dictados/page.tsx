@@ -6,6 +6,9 @@ import { dictadosApi } from "@/lib/api/dictados"
 import { DictadosHeader } from "@/components/dictados/dictados-header"
 import { DictadosTable } from "@/components/dictados/dictados-table"
 import { DictadoDialog } from "@/components/dictados/dictado-dialog"
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
+import AuthGuard from "@/components/auth-guard"
 
 export default function DictadosPage() {
   const [dictados, setDictados] = useState<Dictado[]>([])
@@ -59,19 +62,26 @@ export default function DictadosPage() {
 
   const filteredDictados = dictados.filter(
     (dictado) =>
-      dictado.materia.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      dictado.curso.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      dictado.materia.profesor.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      dictado.materia.profesor.apellido.toLowerCase().includes(searchTerm.toLowerCase()),
+      dictado.materiaNombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      dictado.cursoNombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      dictado.materiaProfesorNombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      dictado.materiaProfesorApellido.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-      <DictadosHeader onCreateClick={handleCreate} searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+    <AuthGuard>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+            <DictadosHeader onCreateClick={handleCreate} searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 
-      <DictadosTable dictados={filteredDictados} loading={loading} onEdit={handleEdit} onDelete={handleDelete} />
+            <DictadosTable dictados={filteredDictados} loading={loading} onEdit={handleEdit} onDelete={handleDelete} />
 
-      <DictadoDialog open={isDialogOpen} onClose={handleDialogClose} dictado={editingDictado} />
-    </div>
+            <DictadoDialog open={isDialogOpen} onClose={handleDialogClose} dictado={editingDictado} />
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
+    </AuthGuard>
   )
 }

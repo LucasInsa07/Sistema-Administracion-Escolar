@@ -2,6 +2,8 @@ package com.demo.sistema_gestion_escolar.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,11 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.demo.sistema_gestion_escolar.dto.InscripcionRequestDTO;
 import com.demo.sistema_gestion_escolar.dto.InscripcionResponseDTO;
-import com.demo.sistema_gestion_escolar.model.Alumno;
-import com.demo.sistema_gestion_escolar.model.Curso;
-import com.demo.sistema_gestion_escolar.model.Inscripcion;
-import com.demo.sistema_gestion_escolar.repository.AlumnoRepository;
-import com.demo.sistema_gestion_escolar.repository.CursoRepository;
+import com.demo.sistema_gestion_escolar.dto.InscripcionesBatchRequestDTO;
+import com.demo.sistema_gestion_escolar.dto.InscripcionesBatchResponseDTO;
 import com.demo.sistema_gestion_escolar.service.InscripcionService;
 
 import jakarta.validation.Valid;
@@ -29,82 +28,64 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/v1/inscripciones")
 public class InscripcionController {
 
+    private static final Logger logger = LoggerFactory.getLogger(InscripcionController.class);
+    
     @Autowired
     private InscripcionService inscripcionService;
 
-    @Autowired
-    private AlumnoRepository alumnoRepository;
-
-    @Autowired
-    private CursoRepository cursoRepository;
-
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<InscripcionResponseDTO> crear(@Valid @RequestBody InscripcionRequestDTO dto) {
-        Inscripcion inscripcion = new Inscripcion();
-        inscripcion.setFechaInscripcion(dto.fechaInscripcion);
-        inscripcion.setEstado(Inscripcion.EstadoInscripcion.valueOf(dto.estado));
-        Alumno alumno = alumnoRepository.findById(dto.alumnoId).orElseThrow(() -> new RuntimeException("Alumno no encontrado"));
-        Curso curso = cursoRepository.findById(dto.cursoId).orElseThrow(() -> new RuntimeException("Curso no encontrado"));
-        inscripcion.setAlumno(alumno);
-        inscripcion.setCurso(curso);
-        Inscripcion creada = inscripcionService.crear(inscripcion);
-        InscripcionResponseDTO res = new InscripcionResponseDTO();
-        res.id = creada.getId();
-        res.fechaInscripcion = creada.getFechaInscripcion();
-        res.estado = creada.getEstado().name();
-        res.alumnoId = creada.getAlumno() != null ? creada.getAlumno().getId() : null;
-        res.cursoId = creada.getCurso() != null ? creada.getCurso().getId() : null;
-        return ResponseEntity.ok(res);
+    public ResponseEntity<InscripcionResponseDTO> crear(@Valid @RequestBody InscripcionRequestDTO inscripcionDto) {
+        logger.info("Recibida petición de creación de inscripción: {}", inscripcionDto);
+        logger.info("Datos del DTO - AlumnoId: {}, CursoId: {}, Estado: {}, FechaInscripcion: {}", 
+                   inscripcionDto.getAlumnoId(), 
+                   inscripcionDto.getCursoId(), 
+                   inscripcionDto.getEstado(), 
+                   inscripcionDto.getFechaInscripcion());
+        try {
+            InscripcionResponseDTO nuevaInscripcion = inscripcionService.crear(inscripcionDto);
+            logger.info("Inscripción creada exitosamente con ID: {}", nuevaInscripcion.getId());
+            return ResponseEntity.ok(nuevaInscripcion);
+        } catch (Exception e) {
+            logger.error("Error al crear inscripción: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @PostMapping("/batch")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<InscripcionesBatchResponseDTO> crearEnLote(@Valid @RequestBody InscripcionesBatchRequestDTO batchRequest) {
+        logger.info("Recibida petición de creación de inscripciones en lote: {}", batchRequest);
+        try {
+            InscripcionesBatchResponseDTO response = inscripcionService.crearInscripcionesEnLote(batchRequest);
+            logger.info("Procesadas {} inscripciones: {} exitosas, {} errores", 
+                       response.getTotalProcesados(), 
+                       response.getTotalExitosas(), 
+                       response.getTotalErrores());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error al crear inscripciones en lote: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     @GetMapping
     public List<InscripcionResponseDTO> obtenerTodas() {
-        return inscripcionService.obtenerTodas().stream().map(i -> {
-            InscripcionResponseDTO r = new InscripcionResponseDTO();
-            r.id = i.getId();
-            r.fechaInscripcion = i.getFechaInscripcion();
-            r.estado = i.getEstado().name();
-            r.alumnoId = i.getAlumno() != null ? i.getAlumno().getId() : null;
-            r.cursoId = i.getCurso() != null ? i.getCurso().getId() : null;
-            return r;
-        }).toList();
+        return inscripcionService.obtenerTodas();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<InscripcionResponseDTO> obtenerPorId(@PathVariable Long id) {
         return inscripcionService.obtenerPorId(id)
-                .map(i -> {
-                    InscripcionResponseDTO r = new InscripcionResponseDTO();
-                    r.id = i.getId();
-                    r.fechaInscripcion = i.getFechaInscripcion();
-                    r.estado = i.getEstado().name();
-                    r.alumnoId = i.getAlumno() != null ? i.getAlumno().getId() : null;
-                    r.cursoId = i.getCurso() != null ? i.getCurso().getId() : null;
-                    return ResponseEntity.ok(r);
-                })
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<InscripcionResponseDTO> actualizar(@PathVariable Long id, @Valid @RequestBody InscripcionRequestDTO dto) {
+    public ResponseEntity<InscripcionResponseDTO> actualizar(@PathVariable Long id, @Valid @RequestBody InscripcionRequestDTO inscripcionDto) {
         try {
-            Inscripcion datos = new Inscripcion();
-            datos.setFechaInscripcion(dto.fechaInscripcion);
-            datos.setEstado(Inscripcion.EstadoInscripcion.valueOf(dto.estado));
-            Alumno alumno = alumnoRepository.findById(dto.alumnoId).orElseThrow(() -> new RuntimeException("Alumno no encontrado"));
-            Curso curso = cursoRepository.findById(dto.cursoId).orElseThrow(() -> new RuntimeException("Curso no encontrado"));
-            datos.setAlumno(alumno);
-            datos.setCurso(curso);
-            Inscripcion actualizada = inscripcionService.actualizar(id, datos);
-            InscripcionResponseDTO r = new InscripcionResponseDTO();
-            r.id = actualizada.getId();
-            r.fechaInscripcion = actualizada.getFechaInscripcion();
-            r.estado = actualizada.getEstado().name();
-            r.alumnoId = actualizada.getAlumno() != null ? actualizada.getAlumno().getId() : null;
-            r.cursoId = actualizada.getCurso() != null ? actualizada.getCurso().getId() : null;
-            return ResponseEntity.ok(r);
+            return ResponseEntity.ok(inscripcionService.actualizar(id, inscripcionDto));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
@@ -113,7 +94,11 @@ public class InscripcionController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        inscripcionService.eliminar(id);
-        return ResponseEntity.noContent().build();
+        try {
+            inscripcionService.eliminar(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

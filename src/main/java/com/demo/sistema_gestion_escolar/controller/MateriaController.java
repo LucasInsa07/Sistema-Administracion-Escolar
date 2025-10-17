@@ -30,8 +30,9 @@ public class MateriaController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Materia> crear(@Valid @RequestBody MateriaRequestDTO materiaDto) {
-        return ResponseEntity.ok(materiaService.crear(materiaDto));
+    public ResponseEntity<MateriaResponseDTO> crear(@Valid @RequestBody MateriaRequestDTO materiaDto) {
+        Materia created = materiaService.crear(materiaDto);
+        return ResponseEntity.ok(materiaService.convertirADTO(created));
     }
 
     @GetMapping
@@ -40,17 +41,18 @@ public class MateriaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Materia> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<MateriaResponseDTO> obtenerPorId(@PathVariable Long id) {
         return materiaService.obtenerPorId(id)
-                .map(ResponseEntity::ok)
+                .map(m -> ResponseEntity.ok(materiaService.convertirADTO(m)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Materia> actualizar(@PathVariable Long id, @Valid @RequestBody MateriaRequestDTO materiaDto) {
+    public ResponseEntity<MateriaResponseDTO> actualizar(@PathVariable Long id, @Valid @RequestBody MateriaRequestDTO materiaDto) {
         try {
-            return ResponseEntity.ok(materiaService.actualizar(id, materiaDto));
+            Materia updated = materiaService.actualizar(id, materiaDto);
+            return ResponseEntity.ok(materiaService.convertirADTO(updated));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }

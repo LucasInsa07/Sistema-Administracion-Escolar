@@ -116,6 +116,7 @@ export function SubjectsTable() {
                 <TableHead>ID</TableHead>
                 <TableHead>Materia</TableHead>
                 <TableHead>Profesor</TableHead>
+                <TableHead>Horario</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
@@ -133,6 +134,18 @@ export function SubjectsTable() {
                     <TableCell className="font-medium">{subject.nombre}</TableCell>
                     <TableCell>
                       {subject.profesorNombre} {subject.profesorApellido}
+                    </TableCell>
+                    <TableCell>
+                      {subject.diaSemana ? (
+                        <div className="text-sm">
+                          <div className="font-medium">{subject.diaSemana}</div>
+                          <div className="text-muted-foreground text-xs">
+                            {subject.horaInicio ? subject.horaInicio : ""}{subject.horaInicio && subject.horaFin ? ` - ${subject.horaFin}` : subject.horaFin ? subject.horaFin : ""}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">

@@ -21,6 +21,8 @@ interface DictadoDialogProps {
 
 export function DictadoDialog({ open, onClose, dictado }: DictadoDialogProps) {
   const [formData, setFormData] = useState<CreateDictadoRequest>({
+    fechaInicio: "",
+    fechaFin: "",
     materiaId: 0,
     cursoId: 0,
     activo: true,
@@ -35,12 +37,16 @@ export function DictadoDialog({ open, onClose, dictado }: DictadoDialogProps) {
       loadCourses()
       if (dictado) {
         setFormData({
-          materiaId: dictado.materia.id,
-          cursoId: dictado.curso.id,
+          fechaInicio: dictado.fechaInicio,
+          fechaFin: dictado.fechaFin,
+          materiaId: dictado.materiaId,
+          cursoId: dictado.cursoId,
           activo: dictado.activo,
         })
       } else {
         setFormData({
+          fechaInicio: "",
+          fechaFin: "",
           materiaId: 0,
           cursoId: 0,
           activo: true,
@@ -52,7 +58,8 @@ export function DictadoDialog({ open, onClose, dictado }: DictadoDialogProps) {
   const loadSubjects = async () => {
     try {
       const data = await subjectsApi.getAll()
-      setSubjects(data.filter((subject) => subject.activo))
+      console.log("All subjects from API:", data)
+      setSubjects(data) // Quitar filtro por activo ya que Subject no tiene ese campo
     } catch (error) {
       console.error("Error loading subjects:", error)
     }
@@ -61,7 +68,10 @@ export function DictadoDialog({ open, onClose, dictado }: DictadoDialogProps) {
   const loadCourses = async () => {
     try {
       const data = await coursesApi.getAll()
-      setCourses(data.filter((course) => course.activo))
+      console.log("All courses from API:", data)
+      console.log("Active courses:", data.filter(c => c.activo))
+      console.log("Inactive courses:", data.filter(c => !c.activo))
+      setCourses(data) // Mostrar todos los cursos por ahora
     } catch (error) {
       console.error("Error loading courses:", error)
     }
@@ -69,7 +79,7 @@ export function DictadoDialog({ open, onClose, dictado }: DictadoDialogProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (formData.materiaId === 0 || formData.cursoId === 0) return
+    if (formData.materiaId === 0 || formData.cursoId === 0 || !formData.fechaInicio || !formData.fechaFin) return
 
     try {
       setLoading(true)
@@ -94,7 +104,31 @@ export function DictadoDialog({ open, onClose, dictado }: DictadoDialogProps) {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="materia">Materia</Label>
+            <Label htmlFor="fechaInicio">Fecha de Inicio</Label>
+            <input
+              type="date"
+              id="fechaInicio"
+              value={formData.fechaInicio}
+              onChange={(e) => setFormData((prev) => ({ ...prev, fechaInicio: e.target.value }))}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="fechaFin">Fecha de Fin</Label>
+            <input
+              type="date"
+              id="fechaFin"
+              value={formData.fechaFin}
+              onChange={(e) => setFormData((prev) => ({ ...prev, fechaFin: e.target.value }))}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="materia">Materia ({subjects.length} disponibles)</Label>
             <Select
               value={formData.materiaId.toString()}
               onValueChange={(value) => setFormData((prev) => ({ ...prev, materiaId: Number.parseInt(value) }))}
@@ -103,10 +137,10 @@ export function DictadoDialog({ open, onClose, dictado }: DictadoDialogProps) {
               <SelectTrigger>
                 <SelectValue placeholder="Seleccionar materia" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-60">
                 {subjects.map((subject) => (
                   <SelectItem key={subject.id} value={subject.id.toString()}>
-                    {subject.nombre} - {subject.profesor.nombre} {subject.profesor.apellido}
+                    {subject.nombre} - {subject.profesorNombre} {subject.profesorApellido}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -114,7 +148,7 @@ export function DictadoDialog({ open, onClose, dictado }: DictadoDialogProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="curso">Curso</Label>
+            <Label htmlFor="curso">Curso ({courses.length} disponibles)</Label>
             <Select
               value={formData.cursoId.toString()}
               onValueChange={(value) => setFormData((prev) => ({ ...prev, cursoId: Number.parseInt(value) }))}
@@ -123,10 +157,10 @@ export function DictadoDialog({ open, onClose, dictado }: DictadoDialogProps) {
               <SelectTrigger>
                 <SelectValue placeholder="Seleccionar curso" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-60">
                 {courses.map((course) => (
                   <SelectItem key={course.id} value={course.id.toString()}>
-                    {course.nombre}
+                    {course.nombre} - Año {course.anio} División {course.division} {!course.activo ? "(Inactivo)" : ""}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -146,7 +180,7 @@ export function DictadoDialog({ open, onClose, dictado }: DictadoDialogProps) {
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading || formData.materiaId === 0 || formData.cursoId === 0}>
+            <Button type="submit" disabled={loading || formData.materiaId === 0 || formData.cursoId === 0 || !formData.fechaInicio || !formData.fechaFin}>
               {loading ? "Guardando..." : dictado ? "Actualizar" : "Crear"}
             </Button>
           </div>

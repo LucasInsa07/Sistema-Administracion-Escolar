@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.demo.sistema_gestion_escolar.model.Curso;
+import com.demo.sistema_gestion_escolar.dto.CursoRequestDTO;
+import com.demo.sistema_gestion_escolar.dto.CursoResponseDTO;
 import com.demo.sistema_gestion_escolar.service.CursoService;
 
 import jakarta.validation.Valid;
@@ -28,17 +29,17 @@ public class CursoController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Curso> crear(@Valid @RequestBody Curso curso) {
-        return ResponseEntity.ok(cursoService.crear(curso));
+    public ResponseEntity<CursoResponseDTO> crear(@Valid @RequestBody CursoRequestDTO cursoDto) {
+        return ResponseEntity.ok(cursoService.crear(cursoDto));
     }
 
     @GetMapping
-    public List<Curso> obtenerTodos() {
+    public List<CursoResponseDTO> obtenerTodos() {
         return cursoService.obtenerTodos();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Curso> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<CursoResponseDTO> obtenerPorId(@PathVariable Long id) {
         return cursoService.obtenerPorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -46,9 +47,9 @@ public class CursoController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Curso> actualizar(@PathVariable Long id, @Valid @RequestBody Curso curso) {
+    public ResponseEntity<CursoResponseDTO> actualizar(@PathVariable Long id, @Valid @RequestBody CursoRequestDTO cursoDto) {
         try {
-            return ResponseEntity.ok(cursoService.actualizar(id, curso));
+            return ResponseEntity.ok(cursoService.actualizar(id, cursoDto));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }

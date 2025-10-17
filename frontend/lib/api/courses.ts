@@ -1,58 +1,32 @@
 import type { Course, CreateCourseRequest } from "@/lib/types"
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api"
+import { apiFetch } from "./client"
 
 export async function getCourses(): Promise<Course[]> {
-  const response = await fetch(`${API_BASE_URL}/cursos`)
-  if (!response.ok) {
-    throw new Error("Failed to fetch courses")
-  }
-  return response.json()
+  return apiFetch("/cursos") as Promise<Course[]>
 }
 
 export async function getCourse(id: number): Promise<Course> {
-  const response = await fetch(`${API_BASE_URL}/cursos/${id}`)
-  if (!response.ok) {
-    throw new Error("Failed to fetch course")
-  }
-  return response.json()
+  return apiFetch(`/cursos/${id}`) as Promise<Course>
 }
 
 export async function createCourse(course: CreateCourseRequest): Promise<Course> {
-  const response = await fetch(`${API_BASE_URL}/cursos`, {
+  return apiFetch("/cursos", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(course),
-  })
-  if (!response.ok) {
-    throw new Error("Failed to create course")
-  }
-  return response.json()
+  }) as Promise<Course>
 }
 
 export async function updateCourse(id: number, course: CreateCourseRequest): Promise<Course> {
-  const response = await fetch(`${API_BASE_URL}/cursos/${id}`, {
+  return apiFetch(`/cursos/${id}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(course),
-  })
-  if (!response.ok) {
-    throw new Error("Failed to update course")
-  }
-  return response.json()
+  }) as Promise<Course>
 }
 
 export async function deleteCourse(id: number): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/cursos/${id}`, {
+  await apiFetch(`/cursos/${id}`, {
     method: "DELETE",
   })
-  if (!response.ok) {
-    throw new Error("Failed to delete course")
-  }
 }
 
 export const coursesApi = {

@@ -30,11 +30,17 @@ export interface Subject {
   profesorId: number
   profesorNombre: string
   profesorApellido: string
+  diaSemana?: string
+  horaInicio?: string
+  horaFin?: string
 }
 
 export interface CreateSubjectRequest {
   nombre: string
   profesorId: number
+  diaSemana?: string
+  horaInicio?: string
+  horaFin?: string
 }
 
 export interface Course {
@@ -58,32 +64,52 @@ export interface CreateCourseRequest {
 
 export interface Enrollment {
   id: number
-  alumno: Student
-  curso: Course
-  estado: "ACTIVO" | "INACTIVO" | "SUSPENDIDO"
   fechaInscripcion: string
-  fechaCreacion?: string
-  fechaActualizacion?: string
+  estado: "ACTIVO" | "FINALIZADO" | "ANULADO"
+  
+  // Datos del alumno aplastados
+  alumnoId: number
+  alumnoNombre: string
+  alumnoApellido: string
+  alumnoEmail: string
+  
+  // Datos del curso aplastados
+  cursoId: number
+  cursoNombre: string
+  cursoDescripcion: string
+  cursoAnio: number
+  cursoDivision: string
+  cursoActivo: boolean
 }
 
 export interface CreateEnrollmentRequest {
   alumnoId: number
   cursoId: number
-  estado: "ACTIVO" | "INACTIVO" | "SUSPENDIDO"
+  estado: "ACTIVO" | "FINALIZADO" | "ANULADO"
   fechaInscripcion: string
 }
 
 export interface Dictado {
   id: number
-  materia: Subject
-  curso: Course
+  fechaInicio: string
+  fechaFin: string
   activo: boolean
-  fechaCreacion?: string
-  fechaActualizacion?: string
+  cursoId: number
+  cursoNombre: string
+  cursoDescripcion: string
+  cursoAnio: number
+  cursoDivision: string
+  materiaId: number
+  materiaNombre: string
+  materiaProfesorId: number
+  materiaProfesorNombre: string
+  materiaProfesorApellido: string
 }
 
 export interface CreateDictadoRequest {
-  materiaId: number
-  cursoId: number
+  fechaInicio: string
+  fechaFin: string
   activo: boolean
+  cursoId: number
+  materiaId: number
 }

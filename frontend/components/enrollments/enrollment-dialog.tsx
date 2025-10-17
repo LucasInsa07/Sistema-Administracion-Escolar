@@ -28,8 +28,8 @@ interface EnrollmentDialogProps {
 
 const ENROLLMENT_STATES = [
   { value: "ACTIVO", label: "Activo" },
-  { value: "INACTIVO", label: "Inactivo" },
-  { value: "SUSPENDIDO", label: "Suspendido" },
+  { value: "FINALIZADO", label: "Finalizado" },
+  { value: "ANULADO", label: "Anulado" },
 ]
 
 export function EnrollmentDialog({ open, onClose, enrollment }: EnrollmentDialogProps) {
@@ -53,8 +53,8 @@ export function EnrollmentDialog({ open, onClose, enrollment }: EnrollmentDialog
   useEffect(() => {
     if (enrollment) {
       setFormData({
-        alumnoId: enrollment.alumno.id,
-        cursoId: enrollment.curso.id,
+        alumnoId: enrollment.alumnoId,
+        cursoId: enrollment.cursoId,
         estado: enrollment.estado,
         fechaInscripcion: enrollment.fechaInscripcion.split("T")[0],
       })
@@ -72,8 +72,11 @@ export function EnrollmentDialog({ open, onClose, enrollment }: EnrollmentDialog
     try {
       setLoadingData(true)
       const [studentsData, coursesData] = await Promise.all([getStudents(), getCourses()])
+      console.log("All courses from API:", coursesData)
+      console.log("Active courses:", coursesData.filter(c => c.activo))
+      console.log("Inactive courses:", coursesData.filter(c => !c.activo))
       setStudents(studentsData)
-      setCourses(coursesData.filter((course) => course.activo))
+      setCourses(coursesData) // Mostrar todos los cursos temporalmente
     } catch (error) {
       console.error("Error loading data:", error)
     } finally {
@@ -83,6 +86,9 @@ export function EnrollmentDialog({ open, onClose, enrollment }: EnrollmentDialog
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    console.log("Form data before submit:", formData)
+    
     if (formData.alumnoId === 0 || formData.cursoId === 0) {
       alert("Por favor seleccione un alumno y un curso")
       return
@@ -92,13 +98,17 @@ export function EnrollmentDialog({ open, onClose, enrollment }: EnrollmentDialog
 
     try {
       if (enrollment) {
+        console.log("Updating enrollment:", enrollment.id, formData)
         await updateEnrollment(enrollment.id, formData)
       } else {
-        await createEnrollment(formData)
+        console.log("Creating new enrollment:", formData)
+        const result = await createEnrollment(formData)
+        console.log("Enrollment created successfully:", result)
       }
       onClose()
     } catch (error) {
       console.error("Error saving enrollment:", error)
+      alert("Error al guardar la inscripción: " + (error as Error).message)
     } finally {
       setLoading(false)
     }
@@ -122,7 +132,7 @@ export function EnrollmentDialog({ open, onClose, enrollment }: EnrollmentDialog
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="alumno">Alumno</Label>
+              <Label htmlFor="alumno">Alumno ({students.length} disponibles)</Label>
               {loadingData ? (
                 <div className="text-sm text-muted-foreground">Cargando alumnos...</div>
               ) : (
@@ -134,7 +144,7 @@ export function EnrollmentDialog({ open, onClose, enrollment }: EnrollmentDialog
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar alumno" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-60">
                     {students.map((student) => (
                       <SelectItem key={student.id} value={student.id.toString()}>
                         {student.nombre} {student.apellido}
@@ -145,7 +155,7 @@ export function EnrollmentDialog({ open, onClose, enrollment }: EnrollmentDialog
               )}
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="curso">Curso</Label>
+              <Label htmlFor="curso">Curso ({courses.length} disponibles)</Label>
               {loadingData ? (
                 <div className="text-sm text-muted-foreground">Cargando cursos...</div>
               ) : (
@@ -157,10 +167,10 @@ export function EnrollmentDialog({ open, onClose, enrollment }: EnrollmentDialog
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar curso" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-60">
                     {courses.map((course) => (
                       <SelectItem key={course.id} value={course.id.toString()}>
-                        {course.nombre} - {course.descripcion}
+                        {course.nombre} - Año {course.anio} División {course.division} {!course.activo ? "(Inactivo)" : ""}
                       </SelectItem>
                     ))}
                   </SelectContent>

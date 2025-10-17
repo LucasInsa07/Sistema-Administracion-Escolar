@@ -1,44 +1,32 @@
 import type { Dictado, CreateDictadoRequest } from "../types"
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api"
+import { apiFetch } from "./client"
 
 export const dictadosApi = {
   getAll: async (): Promise<Dictado[]> => {
-    const response = await fetch(`${API_BASE_URL}/dictados`)
-    if (!response.ok) throw new Error("Error fetching dictados")
-    return response.json()
+    return apiFetch("/dictados") as Promise<Dictado[]>
   },
 
   getById: async (id: number): Promise<Dictado> => {
-    const response = await fetch(`${API_BASE_URL}/dictados/${id}`)
-    if (!response.ok) throw new Error("Error fetching dictado")
-    return response.json()
+    return apiFetch(`/dictados/${id}`) as Promise<Dictado>
   },
 
   create: async (dictado: CreateDictadoRequest): Promise<Dictado> => {
-    const response = await fetch(`${API_BASE_URL}/dictados`, {
+    return apiFetch("/dictados", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dictado),
-    })
-    if (!response.ok) throw new Error("Error creating dictado")
-    return response.json()
+    }) as Promise<Dictado>
   },
 
   update: async (id: number, dictado: CreateDictadoRequest): Promise<Dictado> => {
-    const response = await fetch(`${API_BASE_URL}/dictados/${id}`, {
+    return apiFetch(`/dictados/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dictado),
-    })
-    if (!response.ok) throw new Error("Error updating dictado")
-    return response.json()
+    }) as Promise<Dictado>
   },
 
   delete: async (id: number): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/dictados/${id}`, {
+    await apiFetch(`/dictados/${id}`, {
       method: "DELETE",
     })
-    if (!response.ok) throw new Error("Error deleting dictado")
   },
 }

@@ -17,6 +17,18 @@ public class Curso extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String nombre;
 
+    @Column(length = 500)
+    private String descripcion;
+
+    @Column(nullable = false)
+    private Integer anio;
+
+    @Column(nullable = false, length = 1)
+    private String division;
+
+    @Column(nullable = false)
+    private Boolean activo = true;
+
     @OneToMany(mappedBy = "curso", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Inscripcion> inscripciones;
@@ -33,6 +45,38 @@ public class Curso extends BaseEntity {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public Integer getAnio() {
+        return anio;
+    }
+
+    public void setAnio(Integer anio) {
+        this.anio = anio;
+    }
+
+    public String getDivision() {
+        return division;
+    }
+
+    public void setDivision(String division) {
+        this.division = division;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 
     public List<Inscripcion> getInscripciones() {

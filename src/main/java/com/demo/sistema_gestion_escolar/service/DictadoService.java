@@ -1,14 +1,14 @@
 package com.demo.sistema_gestion_escolar.service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.demo.sistema_gestion_escolar.dto.DictadoRequestDTO;
+import com.demo.sistema_gestion_escolar.dto.DictadoResponseDTO;
 import com.demo.sistema_gestion_escolar.model.Curso;
 import com.demo.sistema_gestion_escolar.model.Dictado;
 import com.demo.sistema_gestion_escolar.model.Materia;
@@ -28,72 +28,64 @@ public class DictadoService {
     @Autowired
     private MateriaRepository materiaRepository;
 
-    public Dictado crear(Dictado dictado) {
+    public DictadoResponseDTO crear(DictadoRequestDTO dictadoDto) {
         // Verificar si el curso existe
-        if (dictado.getCurso() == null || dictado.getCurso().getId() == null) {
-            throw new IllegalArgumentException("El curso no puede ser nulo");
-        }
-        
-        Optional<Curso> cursoExistente = cursoRepository.findById(dictado.getCurso().getId());
+        Optional<Curso> cursoExistente = cursoRepository.findById(dictadoDto.getCursoId());
         if (!cursoExistente.isPresent()) {
-            throw new IllegalArgumentException("El curso con ID " + dictado.getCurso().getId() + " no existe");
+            throw new IllegalArgumentException("El curso con ID " + dictadoDto.getCursoId() + " no existe");
         }
         
         // Verificar si la materia existe
-        if (dictado.getMateria() == null || dictado.getMateria().getId() == null) {
-            throw new IllegalArgumentException("La materia no puede ser nula");
-        }
-        
-        Optional<Materia> materiaExistente = materiaRepository.findById(dictado.getMateria().getId());
+        Optional<Materia> materiaExistente = materiaRepository.findById(dictadoDto.getMateriaId());
         if (!materiaExistente.isPresent()) {
-            throw new IllegalArgumentException("La materia con ID " + dictado.getMateria().getId() + " no existe");
+            throw new IllegalArgumentException("La materia con ID " + dictadoDto.getMateriaId() + " no existe");
         }
         
-        // Asignar las entidades completas y no solo los IDs
+        // Crear nueva entidad
+        Dictado dictado = new Dictado();
+        dictado.setFechaInicio(dictadoDto.getFechaInicio());
+        dictado.setFechaFin(dictadoDto.getFechaFin());
+        dictado.setActivo(dictadoDto.getActivo());
         dictado.setCurso(cursoExistente.get());
         dictado.setMateria(materiaExistente.get());
         
-        return dictadoRepository.save(dictado);
+        Dictado savedDictado = dictadoRepository.save(dictado);
+        return convertirADTO(savedDictado);
     }
 
-    public List<Dictado> obtenerTodos() {
-        return dictadoRepository.findAll();
+    public List<DictadoResponseDTO> obtenerTodos() {
+        return dictadoRepository.findAll().stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
     }
 
-    public Optional<Dictado> obtenerPorId(Long id) {
-        return dictadoRepository.findById(id);
+    public Optional<DictadoResponseDTO> obtenerPorId(Long id) {
+        return dictadoRepository.findById(id)
+                .map(this::convertirADTO);
     }
 
-    public Dictado actualizar(Long id, Dictado datos) {
+    public DictadoResponseDTO actualizar(Long id, DictadoRequestDTO dictadoDto) {
         return dictadoRepository.findById(id).map(d -> {
             // Verificar si el curso existe
-            if (datos.getCurso() != null && datos.getCurso().getId() != null) {
-                Optional<Curso> cursoExistente = cursoRepository.findById(datos.getCurso().getId());
-                if (!cursoExistente.isPresent()) {
-                    throw new IllegalArgumentException("El curso con ID " + datos.getCurso().getId() + " no existe");
-                }
-                d.setCurso(cursoExistente.get());
+            Optional<Curso> cursoExistente = cursoRepository.findById(dictadoDto.getCursoId());
+            if (!cursoExistente.isPresent()) {
+                throw new IllegalArgumentException("El curso con ID " + dictadoDto.getCursoId() + " no existe");
             }
             
             // Verificar si la materia existe
-            if (datos.getMateria() != null && datos.getMateria().getId() != null) {
-                Optional<Materia> materiaExistente = materiaRepository.findById(datos.getMateria().getId());
-                if (!materiaExistente.isPresent()) {
-                    throw new IllegalArgumentException("La materia con ID " + datos.getMateria().getId() + " no existe");
-                }
-                d.setMateria(materiaExistente.get());
+            Optional<Materia> materiaExistente = materiaRepository.findById(dictadoDto.getMateriaId());
+            if (!materiaExistente.isPresent()) {
+                throw new IllegalArgumentException("La materia con ID " + dictadoDto.getMateriaId() + " no existe");
             }
             
-            // Actualizar fechas si se proporcionan
-            if (datos.getFechaInicio() != null) {
-                d.setFechaInicio(datos.getFechaInicio());
-            }
+            // Actualizar campos
+            d.setFechaInicio(dictadoDto.getFechaInicio());
+            d.setFechaFin(dictadoDto.getFechaFin());
+            d.setActivo(dictadoDto.getActivo());
+            d.setCurso(cursoExistente.get());
+            d.setMateria(materiaExistente.get());
             
-            if (datos.getFechaFin() != null) {
-                d.setFechaFin(datos.getFechaFin());
-            }
-            
-            return dictadoRepository.save(d);
+            return convertirADTO(dictadoRepository.save(d));
         }).orElseThrow(() -> new RuntimeException("Dictado no encontrado"));
     }
 
@@ -101,37 +93,27 @@ public class DictadoService {
         dictadoRepository.deleteById(id);
     }
     
-    /**
-     * Convierte un Dictado a un DTO para evitar recursión infinita en la serialización JSON
-     */
-    public Map<String, Object> obtenerDictadoDTO(Dictado dictado) {
-        Map<String, Object> dictadoDTO = new HashMap<>();
-        dictadoDTO.put("id", dictado.getId());
-        dictadoDTO.put("fechaInicio", dictado.getFechaInicio());
-        dictadoDTO.put("fechaFin", dictado.getFechaFin());
-        
-        // Información resumida del curso
-        Map<String, Object> cursoDTO = new HashMap<>();
-        cursoDTO.put("id", dictado.getCurso().getId());
-        cursoDTO.put("nombre", dictado.getCurso().getNombre());
-        dictadoDTO.put("curso", cursoDTO);
-        
-        // Información resumida de la materia
-        Map<String, Object> materiaDTO = new HashMap<>();
-        materiaDTO.put("id", dictado.getMateria().getId());
-        materiaDTO.put("nombre", dictado.getMateria().getNombre());
-        dictadoDTO.put("materia", materiaDTO);
-        
-        return dictadoDTO;
+    private DictadoResponseDTO convertirADTO(Dictado dictado) {
+        return new DictadoResponseDTO(
+                dictado.getId(),
+                dictado.getFechaInicio(),
+                dictado.getFechaFin(),
+                dictado.getActivo(),
+                dictado.getCurso().getId(),
+                dictado.getCurso().getNombre(),
+                dictado.getCurso().getDescripcion(),
+                dictado.getCurso().getAnio(),
+                dictado.getCurso().getDivision(),
+                dictado.getMateria().getId(),
+                dictado.getMateria().getNombre(),
+                dictado.getMateria().getProfesor().getId(),
+                dictado.getMateria().getProfesor().getNombre(),
+                dictado.getMateria().getProfesor().getApellido()
+        );
     }
-    
-    /**
-     * Convierte una lista de Dictados a DTOs
-     */
-    public List<Map<String, Object>> obtenerDictadosDTO(List<Dictado> dictados) {
-        return dictados.stream()
-            .map(this::obtenerDictadoDTO)
-            .collect(Collectors.toList());
+
+    public Optional<Dictado> obtenerEntidadPorId(Long id) {
+        return dictadoRepository.findById(id);
     }
 }
 // Este servicio permite manejar la lógica de negocio relacionada con los dictados.

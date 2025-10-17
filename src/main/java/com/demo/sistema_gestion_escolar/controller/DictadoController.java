@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.demo.sistema_gestion_escolar.model.Dictado;
+import com.demo.sistema_gestion_escolar.dto.DictadoRequestDTO;
+import com.demo.sistema_gestion_escolar.dto.DictadoResponseDTO;
 import com.demo.sistema_gestion_escolar.service.DictadoService;
 
 import jakarta.validation.Valid;
@@ -31,10 +32,10 @@ public class DictadoController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> crear(@Valid @RequestBody Dictado dictado) {
+    public ResponseEntity<?> crear(@Valid @RequestBody DictadoRequestDTO dictadoDto) {
         try {
-            Dictado nuevoDictado = dictadoService.crear(dictado);
-            return ResponseEntity.ok(dictadoService.obtenerDictadoDTO(nuevoDictado));
+            DictadoResponseDTO nuevoDictado = dictadoService.crear(dictadoDto);
+            return ResponseEntity.ok(nuevoDictado);
         } catch (IllegalArgumentException e) {
             Map<String, String> error = new HashMap<>();
             error.put("mensaje", e.getMessage());
@@ -47,24 +48,23 @@ public class DictadoController {
     }
 
     @GetMapping
-    public ResponseEntity<?> obtenerTodos() {
-        List<Dictado> dictados = dictadoService.obtenerTodos();
-        return ResponseEntity.ok(dictadoService.obtenerDictadosDTO(dictados));
+    public List<DictadoResponseDTO> obtenerTodos() {
+        return dictadoService.obtenerTodos();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<DictadoResponseDTO> obtenerPorId(@PathVariable Long id) {
         return dictadoService.obtenerPorId(id)
-                .map(dictado -> ResponseEntity.ok(dictadoService.obtenerDictadoDTO(dictado)))
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody Dictado dictado) {
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody DictadoRequestDTO dictadoDto) {
         try {
-            Dictado actualizado = dictadoService.actualizar(id, dictado);
-            return ResponseEntity.ok(dictadoService.obtenerDictadoDTO(actualizado));
+            DictadoResponseDTO actualizado = dictadoService.actualizar(id, dictadoDto);
+            return ResponseEntity.ok(actualizado);
         } catch (RuntimeException e) {
             Map<String, String> error = new HashMap<>();
             error.put("mensaje", e.getMessage());

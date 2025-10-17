@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.demo.sistema_gestion_escolar.dto.AlumnoRequestDTO;
 import com.demo.sistema_gestion_escolar.dto.AlumnoResponseDTO;
+import com.demo.sistema_gestion_escolar.dto.AlumnosBatchRequestDTO;
+import com.demo.sistema_gestion_escolar.dto.AlumnosBatchResponseDTO;
 import com.demo.sistema_gestion_escolar.model.Alumno;
 import com.demo.sistema_gestion_escolar.service.AlumnoService;
 
@@ -41,20 +43,11 @@ public class AlumnoController {
         return ResponseEntity.ok(res);
     }
 
-    @PostMapping("/lote")
+    @PostMapping("/batch")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<AlumnoResponseDTO>> crearEnLote(@Valid @RequestBody List<AlumnoRequestDTO> dtos) {
-        List<Alumno> alumnos = dtos.stream().map(d -> new Alumno(d.nombre, d.apellido, d.email)).toList();
-        List<Alumno> guardados = alumnoService.crearAlumnosEnLote(alumnos);
-        List<AlumnoResponseDTO> res = guardados.stream().map(a -> {
-            AlumnoResponseDTO r = new AlumnoResponseDTO();
-            r.id = a.getId();
-            r.nombre = a.getNombre();
-            r.apellido = a.getApellido();
-            r.email = a.getEmail();
-            return r;
-        }).toList();
-        return ResponseEntity.ok(res);
+    public ResponseEntity<AlumnosBatchResponseDTO> crearEnLote(@Valid @RequestBody AlumnosBatchRequestDTO batchRequest) {
+        AlumnosBatchResponseDTO response = alumnoService.crearAlumnosEnLote(batchRequest);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping

@@ -27,11 +27,17 @@ public class MateriaService {
         Profesor profesor = profesorRepository.findById(materiaDto.getProfesorId())
                 .orElseThrow(() -> new RuntimeException("Profesor no encontrado"));
         
+        // Validar horarios (si vienen)
+        validarHorarios(materiaDto.getHoraInicio(), materiaDto.getHoraFin());
+
         // Crear la materia
         Materia materia = new Materia();
         materia.setNombre(materiaDto.getNombre());
         materia.setProfesor(profesor);
-        
+        materia.setDiaSemana(materiaDto.getDiaSemana());
+        materia.setHoraInicio(materiaDto.getHoraInicio());
+        materia.setHoraFin(materiaDto.getHoraFin());
+
         return materiaRepository.save(materia);
     }
 
@@ -45,14 +51,17 @@ public class MateriaService {
                 .toList();
     }
 
-    private MateriaResponseDTO convertirADTO(Materia materia) {
-        return new MateriaResponseDTO(
-                materia.getId(),
-                materia.getNombre(),
-                materia.getProfesor().getId(),
-                materia.getProfesor().getNombre(),
-                materia.getProfesor().getApellido()
-        );
+    public MateriaResponseDTO convertirADTO(Materia materia) {
+    return new MateriaResponseDTO(
+        materia.getId(),
+        materia.getNombre(),
+        materia.getProfesor().getId(),
+        materia.getProfesor().getNombre(),
+        materia.getProfesor().getApellido(),
+        materia.getDiaSemana(),
+        materia.getHoraInicio(),
+        materia.getHoraFin()
+    );
     }
 
     public Optional<Materia> obtenerPorId(Long id) {
@@ -64,11 +73,39 @@ public class MateriaService {
             // Buscar el nuevo profesor
             Profesor profesor = profesorRepository.findById(materiaDto.getProfesorId())
                     .orElseThrow(() -> new RuntimeException("Profesor no encontrado"));
-            
+            // Validar horarios
+            validarHorarios(materiaDto.getHoraInicio(), materiaDto.getHoraFin());
+
             m.setNombre(materiaDto.getNombre());
             m.setProfesor(profesor);
+            m.setDiaSemana(materiaDto.getDiaSemana());
+            m.setHoraInicio(materiaDto.getHoraInicio());
+            m.setHoraFin(materiaDto.getHoraFin());
             return materiaRepository.save(m);
         }).orElseThrow(() -> new RuntimeException("Materia no encontrada"));
+    }
+
+    // Valida que si ambas horas están provistas, horaFin sea posterior a horaInicio
+    private void validarHorarios(String horaInicio, String horaFin) {
+        if (horaInicio != null && !horaInicio.isBlank() && horaFin != null && !horaFin.isBlank()) {
+            try {
+                int inicio = parseHoraAMinutos(horaInicio);
+                int fin = parseHoraAMinutos(horaFin);
+                if (fin <= inicio) {
+                    throw new RuntimeException("horaFin debe ser posterior a horaInicio");
+                }
+            } catch (NumberFormatException e) {
+                throw new RuntimeException("Formato de hora inválido, debe ser HH:mm");
+            }
+        }
+    }
+
+    private int parseHoraAMinutos(String hora) {
+        String[] parts = hora.split(":");
+        if (parts.length != 2) throw new NumberFormatException();
+        int h = Integer.parseInt(parts[0]);
+        int m = Integer.parseInt(parts[1]);
+        return h * 60 + m;
     }
 
     public void eliminar(Long id) {
