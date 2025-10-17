@@ -21,7 +21,7 @@ export default function LoginPage() {
     try {
       await login(usuario, contrasena)
       toast({ title: "Inicio de sesión exitoso" })
-      router.push("/")
+      router.push("/dashboard")
     } catch (err: any) {
       toast({ title: "Error", description: err?.message || "No se pudo iniciar sesión" })
     } finally {
