@@ -3,6 +3,8 @@ package com.demo.sistema_gestion_escolar.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 @Entity //La entidad marca la tabla
 @Table(name="alumnos") //Nombre de la tabla
@@ -25,12 +27,28 @@ public class Alumno {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @NotNull(message = "La fecha de nacimiento no puede estar vacía")
+    @Column(name = "fecha_nacimiento", nullable = false)
+    private LocalDate fechaNacimiento;
+
+    @Column(name = "contrasena", nullable = false)
+    private String contrasena;
+
     public Alumno(){}
 
-    public Alumno(String nombre, String apellido, String email){
+    public Alumno(String nombre, String apellido, String email, LocalDate fechaNacimiento){
         this.nombre= nombre;
         this.apellido= apellido;
         this.email= email;
+        this.fechaNacimiento= fechaNacimiento;
+    }
+
+    public Alumno(String nombre, String apellido, String email, LocalDate fechaNacimiento, String contrasena){
+        this.nombre= nombre;
+        this.apellido= apellido;
+        this.email= email;
+        this.fechaNacimiento= fechaNacimiento;
+        this.contrasena= contrasena;
     }
 
     //Getters y setters NECESARIOS PARA JPA
@@ -57,5 +75,17 @@ public class Alumno {
     }
     public void setEmail(String Email){
         this.email=Email;
+    }
+    public LocalDate getFechaNacimiento(){
+        return fechaNacimiento;
+    }
+    public void setFechaNacimiento(LocalDate fechaNacimiento){
+        this.fechaNacimiento=fechaNacimiento;
+    }
+    public String getContrasena(){
+        return contrasena;
+    }
+    public void setContrasena(String contrasena){
+        this.contrasena=contrasena;
     }
 }

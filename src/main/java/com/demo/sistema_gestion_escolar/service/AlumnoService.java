@@ -20,9 +20,17 @@ import com.demo.sistema_gestion_escolar.repository.AlumnoRepository;
 public class AlumnoService {
     @Autowired
     private AlumnoRepository alumnoRepository;
+    
+    @Autowired
+    private PasswordService passwordService;
 
     public Alumno crearAlumno(Alumno alumno){
-    return alumnoRepository.save(alumno);
+        // Generar contraseña automática basada en fecha de nacimiento
+        if (alumno.getFechaNacimiento() != null && alumno.getContrasena() == null) {
+            String contrasenaHash = passwordService.generarContrasenaAlumno(alumno.getFechaNacimiento());
+            alumno.setContrasena(contrasenaHash);
+        }
+        return alumnoRepository.save(alumno);
     }
     public List<Alumno> crearAlumnosEnLote(List<Alumno> alumnos) {
         return alumnoRepository.saveAll(alumnos);
@@ -46,7 +54,15 @@ public class AlumnoService {
                 // Crear y guardar el alumno
                 Alumno alumno = new Alumno(alumnoRequest.nombre, 
                                          alumnoRequest.apellido, 
-                                         alumnoRequest.email);
+                                         alumnoRequest.email, 
+                                         alumnoRequest.fechaNacimiento);
+                
+                // Generar contraseña automática
+                if (alumno.getFechaNacimiento() != null) {
+                    String contrasenaHash = passwordService.generarContrasenaAlumno(alumno.getFechaNacimiento());
+                    alumno.setContrasena(contrasenaHash);
+                }
+                
                 Alumno alumnoGuardado = alumnoRepository.save(alumno);
                 
                 // Convertir a DTO de respuesta
@@ -84,6 +100,25 @@ public class AlumnoService {
     }
     public void eliminarAlumno(Long id) {
         alumnoRepository.deleteById(id);
+    }
+
+    /**
+     * Método para migrar alumnos existentes - generar contraseñas para alumnos que ya tienen fecha de nacimiento
+     * @return número de alumnos migrados
+     */
+    public int migrarContrasenaAlumnosExistentes() {
+        List<Alumno> alumnosSinContrasena = alumnoRepository.findAll().stream()
+            .filter(alumno -> alumno.getFechaNacimiento() != null && 
+                             (alumno.getContrasena() == null || alumno.getContrasena().isEmpty()))
+            .toList();
+        
+        for (Alumno alumno : alumnosSinContrasena) {
+            String contrasenaHash = passwordService.generarContrasenaAlumno(alumno.getFechaNacimiento());
+            alumno.setContrasena(contrasenaHash);
+            alumnoRepository.save(alumno);
+        }
+        
+        return alumnosSinContrasena.size();
     }
 
 }

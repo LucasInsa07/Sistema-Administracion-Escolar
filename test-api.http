@@ -1,0 +1,48 @@
+### SISTEMA DE GESTIÓN ESCOLAR - API TESTING
+### Archivo para probar endpoints con REST Client extension de VS Code
+
+# Variables
+@baseUrl = http://localhost:8080/api/v1
+@contentType = application/json
+
+### 1. LOGIN COMO ADMINISTRADOR
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "usuario": "admin",
+  "contrasena": "admin123"
+}
+
+### 2. MIGRAR CONTRASEÑAS DE ALUMNOS (Usar token del paso 1)  
+POST {{baseUrl}}/alumnos/admin/migrar-contrasenas
+Content-Type: {{contentType}}
+Authorization: Bearer TU_TOKEN_AQUI
+
+### 3. VERIFICAR ALUMNOS (Opcional)
+GET {{baseUrl}}/alumnos
+Content-Type: {{contentType}}
+Authorization: Bearer TU_TOKEN_AQUI
+
+### 4. LOGIN DE ALUMNO DE PRUEBA (Después de migración)
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "usuario": "email_de_algun_alumno@ejemplo.com",
+  "contrasena": "AL150308"
+}
+
+### 5. CREAR NUEVO ALUMNO (Para probar generación automática)
+POST {{baseUrl}}/alumnos
+Content-Type: {{contentType}}
+Authorization: Bearer TU_TOKEN_AQUI
+
+{
+  "nombre": "Carlos",
+  "apellido": "Pérez",
+  "email": "carlos.perez@ejemplo.com",
+  "fechaNacimiento": "2008-03-15"
+}
+
+###

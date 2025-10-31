@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.demo.sistema_gestion_escolar.model.Administrador;
+import com.demo.sistema_gestion_escolar.model.Alumno;
 import com.demo.sistema_gestion_escolar.repository.AdministradorRepository;
+import com.demo.sistema_gestion_escolar.repository.AlumnoRepository;
 import com.demo.sistema_gestion_escolar.security.JwtService;
+import com.demo.sistema_gestion_escolar.service.PasswordService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -24,11 +27,18 @@ import jakarta.validation.constraints.NotBlank;
 public class AuthController {
 
     private final AdministradorRepository administradorRepository;
+    private final AlumnoRepository alumnoRepository;
     private final JwtService jwtService;
+    private final PasswordService passwordService;
 
-    public AuthController(AdministradorRepository administradorRepository, JwtService jwtService) {
+    public AuthController(AdministradorRepository administradorRepository, 
+                         AlumnoRepository alumnoRepository,
+                         JwtService jwtService, 
+                         PasswordService passwordService) {
         this.administradorRepository = administradorRepository;
+        this.alumnoRepository = alumnoRepository;
         this.jwtService = jwtService;
+        this.passwordService = passwordService;
     }
 
     public static class LoginRequest {
@@ -42,27 +52,61 @@ public class AuthController {
         public String token;
         public String rol;
         public String usuario;
+        public Long userId;      // ID del usuario (admin o alumno)
+        public String nombre;    // Solo para alumnos
+        public String apellido;  // Solo para alumnos
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
-        Optional<Administrador> opt = administradorRepository.findByUsuario(req.usuario);
-        if (opt.isEmpty()) {
-            return ResponseEntity.status(401).build();
+        // 1. Intentar login como ADMINISTRADOR
+        Optional<Administrador> adminOpt = administradorRepository.findByUsuario(req.usuario);
+        if (adminOpt.isPresent()) {
+            Administrador admin = adminOpt.get();
+            // Para administradores seguimos usando comparación directa (como estaba antes)
+            if (admin.getContrasena().equals(req.contrasena)) {
+                Map<String, Object> claims = new HashMap<>();
+                claims.put("role", admin.getRol());
+                claims.put("userId", admin.getId());
+                claims.put("userType", "ADMIN");
+                
+                String token = jwtService.generateToken(admin.getUsuario(), claims);
+                LoginResponse res = new LoginResponse();
+                res.token = token;
+                res.rol = admin.getRol();
+                res.usuario = admin.getUsuario();
+                res.userId = admin.getId();
+                return ResponseEntity.ok(res);
+            }
         }
-        Administrador admin = opt.get();
-        // Nota: para demo, comparación directa. Reemplazar por password hashing (BCrypt) luego.
-        if (!admin.getContrasena().equals(req.contrasena)) {
-            return ResponseEntity.status(401).build();
+
+        // 2. Intentar login como ALUMNO (usando email como usuario)
+        Optional<Alumno> alumnoOpt = alumnoRepository.findByEmail(req.usuario);
+        if (alumnoOpt.isPresent()) {
+            Alumno alumno = alumnoOpt.get();
+            // Para alumnos usamos BCrypt para validar contraseñas
+            if (alumno.getContrasena() != null && 
+                passwordService.validarContrasena(req.contrasena, alumno.getContrasena())) {
+                
+                Map<String, Object> claims = new HashMap<>();
+                claims.put("role", "ALUMNO");
+                claims.put("userId", alumno.getId());
+                claims.put("userType", "ALUMNO");
+                
+                String token = jwtService.generateToken(alumno.getEmail(), claims);
+                LoginResponse res = new LoginResponse();
+                res.token = token;
+                res.rol = "ALUMNO";
+                res.usuario = alumno.getEmail();
+                res.userId = alumno.getId();
+                res.nombre = alumno.getNombre();
+                res.apellido = alumno.getApellido();
+                return ResponseEntity.ok(res);
+            }
         }
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("role", admin.getRol());
-        String token = jwtService.generateToken(admin.getUsuario(), claims);
-        LoginResponse res = new LoginResponse();
-        res.token = token;
-        res.rol = admin.getRol();
-        res.usuario = admin.getUsuario();
-        return ResponseEntity.ok(res);
+
+        // 3. Si no se encontró usuario válido o contraseña incorrecta
+        return ResponseEntity.status(401).build();
     }
 
         @GetMapping("/validate")
@@ -77,6 +121,8 @@ public class AuthController {
                 Map<String, Object> body = new HashMap<>();
                 body.put("usuario", claims.getSubject());
                 body.put("role", claims.get("role"));
+                body.put("userId", claims.get("userId"));
+                body.put("userType", claims.get("userType"));
                 return ResponseEntity.ok(body);
             } catch (Exception e) {
                 return ResponseEntity.status(401).build();

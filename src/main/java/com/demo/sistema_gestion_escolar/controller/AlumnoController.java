@@ -33,13 +33,14 @@ public class AlumnoController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AlumnoResponseDTO> crearAlumno(@Valid @RequestBody AlumnoRequestDTO dto) {
-        Alumno alumno = new Alumno(dto.nombre, dto.apellido, dto.email);
+        Alumno alumno = new Alumno(dto.nombre, dto.apellido, dto.email, dto.fechaNacimiento);
         Alumno nuevoAlumno = alumnoService.crearAlumno(alumno);
         AlumnoResponseDTO res = new AlumnoResponseDTO();
         res.id = nuevoAlumno.getId();
         res.nombre = nuevoAlumno.getNombre();
         res.apellido = nuevoAlumno.getApellido();
         res.email = nuevoAlumno.getEmail();
+        res.fechaNacimiento = nuevoAlumno.getFechaNacimiento();
         return ResponseEntity.ok(res);
     }
 
@@ -58,6 +59,7 @@ public class AlumnoController {
             r.nombre = a.getNombre();
             r.apellido = a.getApellido();
             r.email = a.getEmail();
+            r.fechaNacimiento = a.getFechaNacimiento();
             return r;
         }).toList();
     }
@@ -72,6 +74,7 @@ public class AlumnoController {
                     r.nombre = a.getNombre();
                     r.apellido = a.getApellido();
                     r.email = a.getEmail();
+                    r.fechaNacimiento = a.getFechaNacimiento();
                     return ResponseEntity.ok(r);
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -81,13 +84,14 @@ public class AlumnoController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AlumnoResponseDTO> actualizarAlumno(@PathVariable Long id, @Valid @RequestBody AlumnoRequestDTO dto) {
         try {
-            Alumno datos = new Alumno(dto.nombre, dto.apellido, dto.email);
+            Alumno datos = new Alumno(dto.nombre, dto.apellido, dto.email, dto.fechaNacimiento);
             Alumno actualizado = alumnoService.actualizarAlumno(id, datos);
             AlumnoResponseDTO r = new AlumnoResponseDTO();
             r.id = actualizado.getId();
             r.nombre = actualizado.getNombre();
             r.apellido = actualizado.getApellido();
             r.email = actualizado.getEmail();
+            r.fechaNacimiento = actualizado.getFechaNacimiento();
             return ResponseEntity.ok(r);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -99,5 +103,12 @@ public class AlumnoController {
     public ResponseEntity<Void> eliminarAlumno(@PathVariable Long id) {
         alumnoService.eliminarAlumno(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/admin/migrar-contrasenas")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> migrarContrasenasAlumnos() {
+        int alumnosMigrados = alumnoService.migrarContrasenaAlumnosExistentes();
+        return ResponseEntity.ok("Se generaron contraseñas para " + alumnosMigrados + " alumnos exitosamente");
     }
 }
