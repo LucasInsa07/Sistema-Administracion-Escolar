@@ -1,7 +1,7 @@
 package com.demo.sistema_gestion_escolar.service;
 
-import java.util.ArrayList; //Entidad que representa un alumno en la base de datos
-import java.util.List; //Interfaz que maneja operaciones con la base de datos.
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.demo.sistema_gestion_escolar.dto.AlumnoRequestDTO;
 import com.demo.sistema_gestion_escolar.dto.AlumnoResponseDTO;
-import com.demo.sistema_gestion_escolar.dto.AlumnosBatchRequestDTO; //SB inyecta automaticamente dependencias configuradas y funcionales.
+import com.demo.sistema_gestion_escolar.dto.AlumnosBatchRequestDTO;
 import com.demo.sistema_gestion_escolar.dto.AlumnosBatchResponseDTO;
 import com.demo.sistema_gestion_escolar.dto.AlumnosBatchResponseDTO.AlumnoBatchErrorDTO;
 import com.demo.sistema_gestion_escolar.model.Alumno;
