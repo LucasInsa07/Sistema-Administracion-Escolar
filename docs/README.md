@@ -10,7 +10,7 @@
 - **[Arquitectura de Frontend](./architecture/frontend-architecture.md)** - Estructura del cliente Next.js
 - **[Flujo de Datos](./architecture/data-flow.md)** - Cómo circula la información en el sistema
 
-### 🔌 Documentación de API
+###  Documentación de API
 - **[Guía de APIs](./api/README.md)** - Referencia completa de endpoints REST
 - **[Autenticación](./api/authentication.md)** - Sistema de login y tokens JWT
 - **[Módulo de Estudiantes](./api/students.md)** - Gestión de alumnos y operaciones masivas
@@ -27,7 +27,7 @@
 - **[Despliegue](./developer-guides/deployment.md)** - Guías de despliegue y CI/CD
 - **[Troubleshooting](./developer-guides/troubleshooting.md)** - Solución de problemas comunes
 
-### 📊 Diagramas y Modelos
+###  Diagramas y Modelos
 - **[Modelo de Datos](./diagrams/data-model.md)** - ERD y relaciones de base de datos
 - **[Diagramas de Flujo](./diagrams/flow-diagrams.md)** - Procesos de negocio principales
 - **[Arquitectura Visual](./diagrams/architecture-diagrams.md)** - Diagramas de componentes y despliegue
