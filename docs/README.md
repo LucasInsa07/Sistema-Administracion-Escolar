@@ -2,9 +2,9 @@
 
 > **Documentación técnica del sistema de gestión académica desarrollado con Spring Boot y Next.js**
 
-## 📚 Índice de Documentación
+##  Índice de Documentación
 
-### 🏗️ Arquitectura del Sistema
+###  Arquitectura del Sistema
 - **[Resumen Arquitectónico](./architecture/README.md)** - Visión general de la arquitectura y decisiones técnicas
 - **[Arquitectura de Backend](./architecture/backend-architecture.md)** - Estructura del servidor Spring Boot
 - **[Arquitectura de Frontend](./architecture/frontend-architecture.md)** - Estructura del cliente Next.js
@@ -20,7 +20,7 @@
 - **[Módulo de Inscripciones](./api/enrollments.md)** - Inscripciones y estados
 - **[Códigos de Error](./api/error-codes.md)** - Referencia de errores y soluciones
 
-### 👩‍💻 Guías para Desarrolladores
+###  Guías para Desarrolladores
 - **[Configuración del Entorno](./developer-guides/setup.md)** - Setup inicial del proyecto
 - **[Estándares de Código](./developer-guides/coding-standards.md)** - Convenciones y mejores prácticas
 - **[Testing](./developer-guides/testing.md)** - Estrategias de pruebas y herramientas
@@ -34,7 +34,7 @@
 
 ---
 
-## 🚀 Inicio Rápido
+##  Inicio Rápido
 
 ### Para Desarrolladores
 1. **[Configuración inicial](./developer-guides/setup.md#configuración-inicial)**
@@ -53,7 +53,7 @@
 
 ---
 
-## 🔧 Stack Tecnológico
+##  Stack Tecnológico
 
 ### Backend
 - **Framework**: Spring Boot 3.x
@@ -79,7 +79,7 @@
 
 ---
 
-## 📈 Estado del Proyecto
+##  Estado del Proyecto
 
 | Módulo | Estado | Cobertura Tests | Documentación |
 |--------|--------|----------------|---------------|
@@ -93,7 +93,7 @@
 
 ---
 
-## 🤝 Contribuir
+##  Contribuir
 
 Para contribuir al proyecto, revisa:
 - **[Estándares de código](./developer-guides/coding-standards.md)**
@@ -102,7 +102,7 @@ Para contribuir al proyecto, revisa:
 
 ---
 
-## 📞 Contacto y Soporte
+##  Contacto y Soporte
 
 - **Desarrollador Principal**: Lucas Insa
 - **Repositorio**: [GitHub - Sistema-Administracion-Escolar](https://github.com/LucasInsa07/Sistema-Administracion-Escolar)
