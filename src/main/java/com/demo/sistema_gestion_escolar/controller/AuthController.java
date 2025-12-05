@@ -94,6 +94,9 @@ public class AuthController {
                 claims.put("userType", "ALUMNO");
                 
                 String token = jwtService.generateToken(alumno.getEmail(), claims);
+                
+                // IMPORTANTE: Crear response sin referenciar el objeto Alumno
+                // para evitar lazy loading y serialización circular
                 LoginResponse res = new LoginResponse();
                 res.token = token;
                 res.rol = "ALUMNO";
@@ -101,6 +104,10 @@ public class AuthController {
                 res.userId = alumno.getId();
                 res.nombre = alumno.getNombre();
                 res.apellido = alumno.getApellido();
+                
+                // Limpiar referencia para evitar retener el objeto en memoria
+                alumno = null;
+                
                 return ResponseEntity.ok(res);
             }
         }

@@ -5,51 +5,41 @@
 ## 📚 Índice de Documentación
 
 ### 🏗️ Arquitectura del Sistema
-- **[Resumen Arquitectónico](./architecture/README.md)** - Visión general de la arquitectura y decisiones técnicas
-- **[Arquitectura de Backend](./architecture/backend-architecture.md)** - Estructura del servidor Spring Boot
-- **[Arquitectura de Frontend](./architecture/frontend-architecture.md)** - Estructura del cliente Next.js
-- **[Flujo de Datos](./architecture/data-flow.md)** - Cómo circula la información en el sistema
+- **[Resumen Arquitectónico](./arquitectura/README.md)** - Visión general de la arquitectura y decisiones técnicas
+- **[Flujo de Procesos](./diagramas/FLUJO_DE_PROCESOS.md)** - Procesos de negocio del sistema
+- **[Diagrama de Base de Datos](./diagramas/DER_database.md)** - Modelo de datos y relaciones
 
 ### 🔌 Documentación de API
 - **[Guía de APIs](./api/README.md)** - Referencia completa de endpoints REST
-- **[Autenticación](./api/authentication.md)** - Sistema de login y tokens JWT
-- **[Módulo de Estudiantes](./api/students.md)** - Gestión de alumnos y operaciones masivas
-- **[Módulo de Profesores](./api/teachers.md)** - Gestión de docentes
-- **[Módulo de Materias](./api/subjects.md)** - Materias y horarios académicos
-- **[Módulo de Cursos](./api/courses.md)** - Gestión de cursos y divisiones
-- **[Módulo de Inscripciones](./api/enrollments.md)** - Inscripciones y estados
-- **[Códigos de Error](./api/error-codes.md)** - Referencia de errores y soluciones
+- **[Seguridad](./seguridad/README.md)** - Sistema de autenticación y autorización
 
 ### 👩‍💻 Guías para Desarrolladores
-- **[Configuración del Entorno](./developer-guides/setup.md)** - Setup inicial del proyecto
-- **[Estándares de Código](./developer-guides/coding-standards.md)** - Convenciones y mejores prácticas
-- **[Testing](./developer-guides/testing.md)** - Estrategias de pruebas y herramientas
-- **[Despliegue](./developer-guides/deployment.md)** - Guías de despliegue y CI/CD
-- **[Troubleshooting](./developer-guides/troubleshooting.md)** - Solución de problemas comunes
+- **[Configuración del Entorno](./guia-desarrollador/setup.md)** - Setup inicial del proyecto
+- **[Estándares de Código](./guia-desarrollador/estandar-del-codigo.md)** - Convenciones y mejores prácticas
+- **[Optimización de Performance](./guia-desarrollador/performance-optimization.md)** - Mejoras de rendimiento implementadas
 
 ### 📊 Diagramas y Modelos
-- **[Modelo de Datos](./diagrams/data-model.md)** - ERD y relaciones de base de datos
-- **[Diagramas de Flujo](./diagrams/flow-diagrams.md)** - Procesos de negocio principales
-- **[Arquitectura Visual](./diagrams/architecture-diagrams.md)** - Diagramas de componentes y despliegue
+- **[Modelo de Datos](./diagramas/DER_database.md)** - ERD y relaciones de base de datos
+- **[Flujo de Procesos](./diagramas/FLUJO_DE_PROCESOS.md)** - Procesos de negocio principales
 
 ---
 
 ## 🚀 Inicio Rápido
 
 ### Para Desarrolladores
-1. **[Configuración inicial](./developer-guides/setup.md#configuración-inicial)**
-2. **[Ejecutar en desarrollo](./developer-guides/setup.md#ejecutar-en-desarrollo)**
-3. **[Probar APIs](./api/README.md#colección-postman)**
+1. **[Configuración inicial](./guia-desarrollador/setup.md)**
+2. **[Estándares de código](./guia-desarrollador/estandar-del-codigo.md)**
+3. **[Probar APIs](./api/README.md)**
 
 ### Para Arquitectos
-1. **[Visión de la arquitectura](./architecture/README.md#visión-general)**
-2. **[Decisiones técnicas](./architecture/README.md#decisiones-arquitectónicas)**
-3. **[Patrones implementados](./architecture/README.md#patrones-y-principios)**
+1. **[Visión de la arquitectura](./arquitectura/README.md)**
+2. **[Modelo de datos](./diagramas/DER_database.md)**
+3. **[Flujo de procesos](./diagramas/FLUJO_DE_PROCESOS.md)**
 
 ### Para DevOps
-1. **[Guía de despliegue](./developer-guides/deployment.md)**
-2. **[Configuración de entornos](./developer-guides/deployment.md#entornos)**
-3. **[Monitoreo](./developer-guides/deployment.md#monitoreo)**
+1. **[Configuración del entorno](./guia-desarrollador/setup.md)**
+2. **[Optimización de performance](./guia-desarrollador/performance-optimization.md)**
+3. **[Seguridad](./seguridad/README.md)**
 
 ---
 
@@ -79,25 +69,11 @@
 
 ---
 
-## 📈 Estado del Proyecto
-
-| Módulo | Estado | Cobertura Tests | Documentación |
-|--------|--------|----------------|---------------|
-| Autenticación | ✅ Completo | 🔄 En progreso | ✅ Completo |
-| Estudiantes | ✅ Completo | 🔄 En progreso | ✅ Completo |
-| Profesores | ✅ Completo | ❌ Pendiente | ✅ Completo |
-| Materias | ✅ Completo | ❌ Pendiente | ✅ Completo |
-| Cursos | ✅ Completo | ❌ Pendiente | ✅ Completo |
-| Inscripciones | ✅ Completo | ❌ Pendiente | ✅ Completo |
-| Reportes | 🔄 En progreso | ❌ Pendiente | 🔄 En progreso |
-
----
-
 ## 🤝 Contribuir
 
 Para contribuir al proyecto, revisa:
-- **[Estándares de código](./developer-guides/coding-standards.md)**
-- **[Proceso de desarrollo](./developer-guides/development-process.md)**
+- **[Estándares de código](./guia-desarrollador/estandar-del-codigo.md)**
+- **[Configuración del entorno](./guia-desarrollador/setup.md)**
 - **[Guía de testing](./developer-guides/testing.md)**
 
 ---

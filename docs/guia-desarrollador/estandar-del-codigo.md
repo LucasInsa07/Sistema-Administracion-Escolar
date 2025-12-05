@@ -446,14 +446,4 @@ const MAX_STUDENTS_PER_PAGE = 20;
 
 ---
 
-## 📞 **APLICACIÓN INMEDIATA**
-
-Para aplicar estos estándares al proyecto actual:
-
-1. **Corregir naming inconsistencies** en `Alumno.java`
-2. **Actualizar imports** y comentarios confusos
-3. **Implementar constructor injection** donde sea necesario
-4. **Agregar validaciones de parámetros**
-5. **Standardizar JavaDoc** en métodos públicos
-
 Este documento servirá como referencia para mantener calidad y consistencia en todo el desarrollo futuro del proyecto.

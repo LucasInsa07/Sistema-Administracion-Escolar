@@ -54,13 +54,15 @@ public class InscripcionService {
     }
 
     public List<InscripcionResponseDTO> obtenerTodas() {
-        return inscripcionRepository.findAll().stream()
+        // OPTIMIZACIÓN: Usar JOIN FETCH para evitar N+1 queries
+        return inscripcionRepository.findAllWithAlumnoAndCurso().stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
     public Optional<InscripcionResponseDTO> obtenerPorId(Long id) {
-        return inscripcionRepository.findById(id)
+        // OPTIMIZACIÓN: Usar JOIN FETCH para evitar lazy loading
+        return inscripcionRepository.findByIdWithAlumnoAndCurso(id)
                 .map(this::convertirADTO);
     }
 

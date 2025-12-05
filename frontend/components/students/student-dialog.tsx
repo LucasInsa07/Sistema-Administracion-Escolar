@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { DatePicker } from "@/components/ui/date-picker"
 import { createStudent, updateStudent } from "@/lib/api/students"
 import type { Student, CreateStudentRequest } from "@/lib/types"
 
@@ -28,7 +29,9 @@ export function StudentDialog({ open, onClose, student }: StudentDialogProps) {
     nombre: "",
     apellido: "",
     email: "",
+    fechaNacimiento: "",
   })
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>()
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -37,13 +40,22 @@ export function StudentDialog({ open, onClose, student }: StudentDialogProps) {
         nombre: student.nombre,
         apellido: student.apellido,
         email: student.email,
+        fechaNacimiento: student.fechaNacimiento || "",
       })
+      // Convertir la fecha del estudiante a objeto Date si existe
+      if (student.fechaNacimiento) {
+        setSelectedDate(new Date(student.fechaNacimiento))
+      } else {
+        setSelectedDate(undefined)
+      }
     } else {
       setFormData({
         nombre: "",
         apellido: "",
         email: "",
+        fechaNacimiento: "",
       })
+      setSelectedDate(undefined)
     }
   }, [student, open])
 
@@ -67,6 +79,17 @@ export function StudentDialog({ open, onClose, student }: StudentDialogProps) {
 
   const handleInputChange = (field: keyof CreateStudentRequest, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleDateChange = (date: Date | undefined) => {
+    setSelectedDate(date)
+    if (date) {
+      // Formatear la fecha como YYYY-MM-DD para el backend
+      const formattedDate = date.toISOString().split('T')[0]
+      setFormData((prev) => ({ ...prev, fechaNacimiento: formattedDate }))
+    } else {
+      setFormData((prev) => ({ ...prev, fechaNacimiento: "" }))
+    }
   }
 
   return (
@@ -108,6 +131,14 @@ export function StudentDialog({ open, onClose, student }: StudentDialogProps) {
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="fechaNacimiento">Fecha de Nacimiento</Label>
+              <DatePicker
+                date={selectedDate}
+                onDateChange={handleDateChange}
+                placeholder="Selecciona fecha de nacimiento"
               />
             </div>
           </div>

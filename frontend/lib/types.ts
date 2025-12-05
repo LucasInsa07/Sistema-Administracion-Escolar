@@ -3,12 +3,14 @@ export interface Student {
   nombre: string
   apellido: string
   email: string
+  fechaNacimiento?: string
 }
 
 export interface CreateStudentRequest {
   nombre: string
   apellido: string
   email: string
+  fechaNacimiento?: string
 }
 
 export interface Teacher {
