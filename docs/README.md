@@ -2,14 +2,14 @@
 
 > **Documentación técnica del sistema de gestión académica desarrollado con Spring Boot y Next.js**
 
-## 📚 Índice de Documentación
+##  Índice de Documentación
 
 ### 🏗️ Arquitectura del Sistema
 - **[Resumen Arquitectónico](./arquitectura/README.md)** - Visión general de la arquitectura y decisiones técnicas
 - **[Flujo de Procesos](./diagramas/FLUJO_DE_PROCESOS.md)** - Procesos de negocio del sistema
 - **[Diagrama de Base de Datos](./diagramas/DER_database.md)** - Modelo de datos y relaciones
 
-### 🔌 Documentación de API
+###  Documentación de API
 - **[Guía de APIs](./api/README.md)** - Referencia completa de endpoints REST
 - **[Seguridad](./seguridad/README.md)** - Sistema de autenticación y autorización
 
@@ -24,7 +24,7 @@
 
 ---
 
-## 🚀 Inicio Rápido
+##  Inicio Rápido
 
 ### Para Desarrolladores
 1. **[Configuración inicial](./guia-desarrollador/setup.md)**
@@ -43,7 +43,7 @@
 
 ---
 
-## 🔧 Stack Tecnológico
+##  Stack Tecnológico
 
 ### Backend
 - **Framework**: Spring Boot 3.x
@@ -69,7 +69,8 @@
 
 ---
 
-## 🤝 Contribuir
+
+##  Contribuir
 
 Para contribuir al proyecto, revisa:
 - **[Estándares de código](./guia-desarrollador/estandar-del-codigo.md)**
@@ -78,9 +79,12 @@ Para contribuir al proyecto, revisa:
 
 ---
 
-## 📞 Contacto y Soporte
+##  Contacto y Soporte
 
-- **Desarrollador Principal**: Lucas Insa
+- **Desarrollador Principal**: Lucas Insabralde
+  **Desarrollador Secundario**: Thomas Ruiz Diaz
+  **DevOps** : Nicolás Moscova Dimiro
+  **Arquitecto** : Manuel Margulis
 - **Repositorio**: [GitHub - Sistema-Administracion-Escolar](https://github.com/LucasInsa07/Sistema-Administracion-Escolar)
 - **Documentación Legacy**: [Ver archivos legacy](./legacy/)
 
