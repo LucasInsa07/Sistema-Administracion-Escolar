@@ -37,14 +37,14 @@ El Sistema de Administración Escolar AAES es una aplicación web fullstack desa
 ### Punto de Conexión Principal
 El frontend se comunica con el backend a través de una API REST centralizada:
 
-**URL Base del Backend**: `http://localhost:8080/api`
+**URL Base del Backend**: `https://administracion.thomasruizdiaz.com`
 
 ### Implementación de la Comunicación
 
 #### En el Frontend (Next.js/TypeScript)
 **Archivo**: `frontend/lib/api/index.ts`
 ```typescript
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://administracion.thomasruizdiaz.com';
 
 // Wrapper centralizado para todas las llamadas HTTP
 export const apiClient = {
