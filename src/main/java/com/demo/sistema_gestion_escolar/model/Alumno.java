@@ -40,6 +40,9 @@ public class Alumno {
     @Column(name = "contrasena", nullable = false)
     private String contrasena;
 
+    @Column(name = "estado", nullable = false)
+    private String estado = "ACTIVO"; // ACTIVO, INACTIVO
+
     public Alumno() {
     }
 
@@ -101,5 +104,13 @@ public class Alumno {
     
     public void setContrasena(String contrasena) {
         this.contrasena = contrasena;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+    
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }

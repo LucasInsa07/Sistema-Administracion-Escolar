@@ -16,11 +16,21 @@ export async function apiFetch(path: string, init: RequestInit = {}) {
 
   const res = await fetch(url, { ...init, headers })
   if (!res.ok) {
-    let detail = ""
+    let errorMessage = `HTTP ${res.status} ${res.statusText}`
     try {
-      detail = await res.text()
-    } catch {}
-    throw new Error(`HTTP ${res.status} ${res.statusText}${detail ? ` - ${detail}` : ""}`)
+      const contentType = res.headers.get("content-type") || ""
+      if (contentType.includes("application/json")) {
+        const errorData = await res.json()
+        // Extraer el mensaje del JSON de error del backend
+        errorMessage = errorData.message || errorData.error || errorMessage
+      } else {
+        const textError = await res.text()
+        if (textError) errorMessage = textError
+      }
+    } catch {
+      // Si no se puede parsear el error, usar el mensaje por defecto
+    }
+    throw new Error(errorMessage)
   }
   const contentType = res.headers.get("content-type") || ""
   if (contentType.includes("application/json")) return res.json()

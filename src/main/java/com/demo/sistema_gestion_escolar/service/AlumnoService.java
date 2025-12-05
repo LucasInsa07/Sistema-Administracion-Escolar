@@ -14,6 +14,7 @@ import com.demo.sistema_gestion_escolar.dto.AlumnosBatchResponseDTO;
 import com.demo.sistema_gestion_escolar.dto.AlumnosBatchResponseDTO.AlumnoBatchErrorDTO;
 import com.demo.sistema_gestion_escolar.model.Alumno;
 import com.demo.sistema_gestion_escolar.repository.AlumnoRepository;
+import com.demo.sistema_gestion_escolar.repository.InscripcionRepository;
 
 
 @Service
@@ -23,6 +24,9 @@ public class AlumnoService {
     
     @Autowired
     private PasswordService passwordService;
+
+    @Autowired
+    private InscripcionRepository inscripcionRepository;
 
     public Alumno crearAlumno(Alumno alumno){
         // Generar contraseña automática basada en fecha de nacimiento
@@ -100,6 +104,43 @@ public class AlumnoService {
     }
     public void eliminarAlumno(Long id) {
         alumnoRepository.deleteById(id);
+    }
+
+    /**
+     * Soft delete: marca al alumno como inactivo en lugar de eliminarlo
+     */
+    public void desactivarAlumno(Long id) {
+        Optional<Alumno> alumnoOpt = alumnoRepository.findById(id);
+        if (alumnoOpt.isPresent()) {
+            Alumno alumno = alumnoOpt.get();
+            alumno.setEstado("INACTIVO");
+            alumnoRepository.save(alumno);
+        } else {
+            throw new RuntimeException("Alumno con ID " + id + " no encontrado");
+        }
+    }
+
+    /**
+     * Hard delete: elimina físicamente al alumno y todas sus inscripciones
+     */
+    public void eliminarAlumnoCompleto(Long id) {
+        Optional<Alumno> alumnoOpt = alumnoRepository.findById(id);
+        if (alumnoOpt.isPresent()) {
+            // Primero eliminar todas las inscripciones del alumno
+            // Esto se debe hacer antes de eliminar el alumno para evitar violation de FK
+            eliminarInscripcionesDelAlumno(id);
+            // Luego eliminar el alumno
+            alumnoRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Alumno con ID " + id + " no encontrado");
+        }
+    }
+
+    /**
+     * Método auxiliar para eliminar todas las inscripciones de un alumno
+     */
+    private void eliminarInscripcionesDelAlumno(Long alumnoId) {
+        inscripcionRepository.deleteByAlumnoId(alumnoId);
     }
 
     /**

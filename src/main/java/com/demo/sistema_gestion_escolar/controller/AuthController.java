@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.demo.sistema_gestion_escolar.exception.InvalidCredentialsException;
 import com.demo.sistema_gestion_escolar.model.Administrador;
 import com.demo.sistema_gestion_escolar.model.Alumno;
 import com.demo.sistema_gestion_escolar.repository.AdministradorRepository;
@@ -113,7 +114,7 @@ public class AuthController {
         }
 
         // 3. Si no se encontró usuario válido o contraseña incorrecta
-        return ResponseEntity.status(401).build();
+        throw new InvalidCredentialsException();
     }
 
         @GetMapping("/validate")

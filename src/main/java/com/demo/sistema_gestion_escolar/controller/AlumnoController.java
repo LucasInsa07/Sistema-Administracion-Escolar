@@ -105,6 +105,28 @@ public class AlumnoController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}/desactivar")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> desactivarAlumno(@PathVariable Long id) {
+        try {
+            alumnoService.desactivarAlumno(id);
+            return ResponseEntity.ok("Alumno desactivado exitosamente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}/completo")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> eliminarAlumnoCompleto(@PathVariable Long id) {
+        try {
+            alumnoService.eliminarAlumnoCompleto(id);
+            return ResponseEntity.ok("Alumno eliminado permanentemente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Error al eliminar: " + e.getMessage());
+        }
+    }
+
     @PostMapping("/admin/migrar-contrasenas")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> migrarContrasenasAlumnos() {

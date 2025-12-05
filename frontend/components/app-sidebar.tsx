@@ -1,7 +1,9 @@
 "use client"
 
-import { BookOpen, GraduationCap, Home, Users, UserCheck, Calendar, Settings, BookMarked, BarChart } from "lucide-react"
+import { BookOpen, GraduationCap, Home, Users, UserCheck, Calendar, BookMarked, User } from "lucide-react"
 import { usePathname } from "next/navigation"
+import { getAuth } from "@/lib/auth"
+import { useState, useEffect } from "react"
 
 import {
   Sidebar,
@@ -22,51 +24,90 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-const items = [
-  {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: Home,
-  },
-  {
-    title: "Alumnos",
-    url: "/alumnos",
-    icon: GraduationCap,
-  },
-  {
-    title: "Profesores",
-    url: "/profesores",
-    icon: Users,
-  },
-  {
-    title: "Materias",
-    url: "/materias",
-    icon: BookOpen,
-  },
-  {
-    title: "Cursos",
-    url: "/cursos",
-    icon: Calendar,
-  },
-  {
-    title: "Dictados",
-    url: "/dictados",
-    icon: BookMarked,
-  },
-  {
-    title: "Inscripciones",
-    url: "/inscripciones",
-    icon: UserCheck,
-  },
-  {
-    title: "Reportes",
-    url: "/reportes",
-    icon: BarChart,
-  },
-]
+const getMenuItems = (rol: string | null) => {
+  const baseItems = [
+    {
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: Home,
+      roles: ["ADMIN", "ALUMNO"]
+    },
+  ]
+  
+  const adminItems = [
+    {
+      title: "Alumnos",
+      url: "/alumnos",
+      icon: GraduationCap,
+      roles: ["ADMIN"]
+    },
+    {
+      title: "Profesores",
+      url: "/profesores",
+      icon: Users,
+      roles: ["ADMIN"]
+    },
+    {
+      title: "Materias",
+      url: "/materias",
+      icon: BookOpen,
+      roles: ["ADMIN"]
+    },
+    {
+      title: "Cursos",
+      url: "/cursos",
+      icon: Calendar,
+      roles: ["ADMIN"]
+    },
+    {
+      title: "Dictados",
+      url: "/dictados",
+      icon: BookMarked,
+      roles: ["ADMIN"]
+    },
+    {
+      title: "Inscripciones",
+      url: "/inscripciones",
+      icon: UserCheck,
+      roles: ["ADMIN"]
+    },
+  ]
+  
+  const studentItems = [
+    {
+      title: "Mis Materias",
+      url: "/materias",
+      icon: BookOpen,
+      roles: ["ALUMNO"]
+    },
+    {
+      title: "Mi Perfil",
+      url: "/perfil",
+      icon: User,
+      roles: ["ALUMNO"]
+    },
+  ]
+  
+  // Si no hay rol definido, mostrar items de admin por defecto
+  // Esto ayuda durante la carga inicial
+  if (!rol) {
+    return [...baseItems, ...adminItems]
+  }
+  
+  const specificItems = rol === "ALUMNO" ? studentItems : adminItems
+  return [...baseItems, ...specificItems]
+}
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const [userRole, setUserRole] = useState<string | null>(null)
+  
+  useEffect(() => {
+    const { rol } = getAuth()
+    setUserRole(rol)
+  }, [])
+  
+  const items = getMenuItems(userRole)
 
   return (
     <TooltipProvider delayDuration={300}>
@@ -126,31 +167,6 @@ export function AppSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
-        
-        <SidebarFooter className="px-2 pb-4">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <SidebarMenuButton className="
-                    w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium
-                    transition-all duration-200 ease-in-out
-                    group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2
-                    text-sidebar-foreground hover:bg-primary/10 hover:text-primary hover:shadow-sm
-                  " asChild>
-                    <a href="/configuracion" className="flex items-center gap-3 w-full">
-                      <Settings className="h-5 w-5 shrink-0" />
-                      <span className="group-data-[collapsible=icon]:hidden">Configuración</span>
-                    </a>
-                  </SidebarMenuButton>
-                </TooltipTrigger>
-                <TooltipContent side="right" className="group-data-[collapsible=icon]:flex hidden">
-                  <p>Configuración</p>
-                </TooltipContent>
-              </Tooltip>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarFooter>
       </Sidebar>
     </TooltipProvider>
   )

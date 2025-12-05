@@ -7,7 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Search, Plus, Edit, Trash2 } from "lucide-react"
 import { StudentDialog } from "./student-dialog"
-import { getStudents, deleteStudent } from "@/lib/api/students"
+import { DeleteConfirmationDialog } from "./delete-confirmation-dialog"
+import { getStudents, softDeleteStudent, hardDeleteStudent } from "@/lib/api/students"
 import type { Student } from "@/lib/types"
 
 export function StudentsTable() {
@@ -17,6 +18,9 @@ export function StudentsTable() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [studentToDelete, setStudentToDelete] = useState<Student | null>(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   useEffect(() => {
     loadStudents()
@@ -49,15 +53,37 @@ export function StudentsTable() {
     setIsDialogOpen(true)
   }
 
-  const handleDelete = async (id: number) => {
-    if (confirm("¿Está seguro de que desea eliminar este alumno?")) {
-      try {
-        await deleteStudent(id)
-        await loadStudents()
-      } catch (error) {
-        console.error("Error deleting student:", error)
+  const handleDelete = (student: Student) => {
+    setStudentToDelete(student)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const handleDeleteConfirm = async (deleteType: 'hard' | 'soft') => {
+    if (!studentToDelete) return
+    
+    try {
+      setDeleteLoading(true)
+      
+      if (deleteType === 'soft') {
+        await softDeleteStudent(studentToDelete.id)
+      } else {
+        await hardDeleteStudent(studentToDelete.id)
       }
+      
+      await loadStudents()
+      setIsDeleteDialogOpen(false)
+      setStudentToDelete(null)
+    } catch (error) {
+      console.error("Error deleting student:", error)
+      // Aquí podrías mostrar un toast con el error
+    } finally {
+      setDeleteLoading(false)
     }
+  }
+
+  const handleDeleteCancel = () => {
+    setIsDeleteDialogOpen(false)
+    setStudentToDelete(null)
   }
 
   const handleDialogClose = () => {
@@ -126,7 +152,7 @@ export function StudentsTable() {
                         <Button variant="ghost" size="sm" onClick={() => handleEdit(student)}>
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDelete(student.id)}>
+                        <Button variant="ghost" size="sm" onClick={() => handleDelete(student)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -140,6 +166,14 @@ export function StudentsTable() {
       </CardContent>
 
       <StudentDialog open={isDialogOpen} onClose={handleDialogClose} student={selectedStudent} />
+      
+      <DeleteConfirmationDialog
+        open={isDeleteDialogOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        studentName={studentToDelete ? `${studentToDelete.nombre} ${studentToDelete.apellido}` : ""}
+        loading={deleteLoading}
+      />
     </Card>
   )
 }

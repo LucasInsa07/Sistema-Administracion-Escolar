@@ -59,6 +59,16 @@ export async function deleteStudent(id: number): Promise<void> {
   await apiFetch(`/alumnos/${id}`, { method: "DELETE" })
 }
 
+export async function softDeleteStudent(id: number): Promise<string> {
+  const response = await apiFetch(`/alumnos/${id}/desactivar`, { method: "PUT" })
+  return response as string
+}
+
+export async function hardDeleteStudent(id: number): Promise<string> {
+  const response = await apiFetch(`/alumnos/${id}/completo`, { method: "DELETE" })
+  return response as string
+}
+
 // Objeto con todas las funciones para compatibilidad
 export const studentsApi = {
   getAll: getStudents,
@@ -67,4 +77,6 @@ export const studentsApi = {
   createBatch: createStudentsBatch,
   update: updateStudent,
   delete: deleteStudent,
+  softDelete: softDeleteStudent,
+  hardDelete: hardDeleteStudent,
 }
