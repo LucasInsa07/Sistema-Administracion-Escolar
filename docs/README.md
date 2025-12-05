@@ -47,7 +47,7 @@
 
 ### Backend
 - **Framework**: Spring Boot 3.x
-- **Lenguaje**: Java 17+
+- **Lenguaje**: Java 21
 - **Base de Datos**: MySQL/PostgreSQL con soporte H2 para testing
 - **Seguridad**: Spring Security + JWT
 - **ORM**: JPA/Hibernate
