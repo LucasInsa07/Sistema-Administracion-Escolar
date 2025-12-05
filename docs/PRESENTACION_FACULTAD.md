@@ -1,17 +1,19 @@
 # Sistema de Administración Escolar AAES
-## Presentación para Facultad
+## Presentación para Proyecto de Construccion de Software - Universidad de Belgrano
 
-> **Documento técnico para exposición académica - Decisiones arquitectónicas y implementación**
+INSABRALDE - MARGULIS - RUIZ DIAZ - MOSCOVA DIMIRO
+
+> **Documento técnico para exposición académica - Decisiones arquitectónicas e implementación**
 
 ---
 
-## 🎯 Resumen Ejecutivo
+##  Resumen Ejecutivo
 
 El Sistema de Administración Escolar AAES es una aplicación web fullstack desarrollada para gestionar instituciones educativas, implementando una arquitectura moderna basada en microservicios con separación clara entre frontend y backend.
 
 ---
 
-## 🏗️ Arquitectura General del Sistema
+##  Arquitectura General del Sistema
 
 ### Visión de Alto Nivel
 ```
@@ -30,7 +32,7 @@ El Sistema de Administración Escolar AAES es una aplicación web fullstack desa
 
 ---
 
-## 🔗 Conexión Frontend-Backend
+##  Conexión Frontend-Backend
 
 ### Punto de Conexión Principal
 El frontend se comunica con el backend a través de una API REST centralizada:
@@ -80,7 +82,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 ---
 
-## 🗄️ Acceso y Gestión de Base de Datos
+##  Acceso y Gestión de Base de Datos
 
 ### Configuración de Conexión
 **Archivo**: `src/main/resources/application.properties`
@@ -200,7 +202,7 @@ spring.profiles.active=${SPRING_PROFILES_ACTIVE:dev}
 
 ---
 
-## ☕ Justificación: ¿Por qué Java + Spring Boot?
+##  Justificación: ¿Por qué Java + Spring Boot?
 
 ### Ventajas Técnicas de Java
 
@@ -250,25 +252,15 @@ public class AlumnoController {
 - **Testing**: Excelente soporte para testing integrado
 - **Monitoring**: Actuator para métricas y health checks
 
-### Comparación con Alternativas
-
-| Aspecto | Spring Boot | Node.js | Django | .NET Core |
-|---------|-------------|---------|--------|-----------|
-| **Performance** | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **Escalabilidad** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **Ecosystem** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **Enterprise Ready** | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **Learning Curve** | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
-
 ### Casos de Uso Ideales para Spring Boot
 - **Aplicaciones Enterprise**: Gestión de datos complejos
 - **APIs REST Robustas**: Con validaciones y seguridad
 - **Sistemas de Gestión**: Como nuestro sistema escolar
 - **Microservicios**: Fácil distribución y escalado
-
+- Es por esto mismo que seleccionamos Spring Boot. Cumple con TODO.
 ---
 
-## 📊 Métricas del Proyecto
+##  Métricas del Proyecto
 
 ### Cobertura Actual
 - **Endpoints REST**: 15+ implementados
@@ -282,27 +274,10 @@ public class AlumnoController {
 - **Connection Pooling**: HikariCP configurado
 - **Lazy Loading**: Estratégicamente implementado
 - **DTO Pattern**: Transferencia eficiente de datos
-
+  
 ---
 
-## 🚀 Próximos Pasos y Escalabilidad
-
-### Mejoras Planificadas
-1. **Cache Redis**: Para consultas frecuentes
-2. **Elasticsearch**: Para búsquedas avanzadas
-3. **Docker**: Containerización completa
-4. **CI/CD Pipeline**: Automatización de deploy
-5. **Monitoring**: Prometheus + Grafana
-
-### Preparación para Producción
-- **Health Checks**: Spring Boot Actuator configurado
-- **Logging**: Logback con diferentes niveles por ambiente
-- **Security**: JWT + HTTPS + input validation
-- **Database Migration**: Flyway para versionado de DB
-
----
-
-## 🎓 Conclusiones para la Presentación
+##  Conclusiones
 
 ### Aspectos Destacables
 1. **Arquitectura Sólida**: Separación clara de responsabilidades
@@ -319,5 +294,5 @@ public class AlumnoController {
 
 ---
 
-**Desarrollado con ❤️ para AAES - Universidad**  
+**Desarrollado con ❤️ para AAES - Universidad de Belgrano**  
 *Sistema de Administración Escolar - Proyecto Final*
