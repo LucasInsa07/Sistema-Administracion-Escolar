@@ -4,7 +4,7 @@
 
 ##  Índice de Documentación
 
-### 🏗️ Arquitectura del Sistema
+###  Arquitectura del Sistema
 - **[Resumen Arquitectónico](./arquitectura/README.md)** - Visión general de la arquitectura y decisiones técnicas
 - **[Flujo de Procesos](./diagramas/FLUJO_DE_PROCESOS.md)** - Procesos de negocio del sistema
 - **[Diagrama de Base de Datos](./diagramas/DER_database.md)** - Modelo de datos y relaciones
@@ -13,12 +13,12 @@
 - **[Guía de APIs](./api/README.md)** - Referencia completa de endpoints REST
 - **[Seguridad](./seguridad/README.md)** - Sistema de autenticación y autorización
 
-### 👩‍💻 Guías para Desarrolladores
+###  Guías para Desarrolladores
 - **[Configuración del Entorno](./guia-desarrollador/setup.md)** - Setup inicial del proyecto
 - **[Estándares de Código](./guia-desarrollador/estandar-del-codigo.md)** - Convenciones y mejores prácticas
 - **[Optimización de Performance](./guia-desarrollador/performance-optimization.md)** - Mejoras de rendimiento implementadas
 
-### 📊 Diagramas y Modelos
+###  Diagramas y Modelos
 - **[Modelo de Datos](./diagramas/DER_database.md)** - ERD y relaciones de base de datos
 - **[Flujo de Procesos](./diagramas/FLUJO_DE_PROCESOS.md)** - Procesos de negocio principales
 
